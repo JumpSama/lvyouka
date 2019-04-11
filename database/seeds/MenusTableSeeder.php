@@ -51,6 +51,12 @@ class MenusTableSeeder extends Seeder
                 'updated_at' => Carbon::now()
             ],
             [
+                'name' => '系统设置',
+                'value' => 'config',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ],
+            [
                 'name' => '操作日志',
                 'value' => 'log',
                 'created_at' => Carbon::now(),

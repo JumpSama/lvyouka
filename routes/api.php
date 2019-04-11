@@ -60,5 +60,8 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
         $api->post('role_del', 'RoleController@roleDel');
         // 菜单全部
         $api->post('menu_all', 'RoleController@menuAll');
+
+        // 日志列表
+        $api->post('log_list', 'LogController@logList');
     });
 });
