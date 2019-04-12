@@ -9,7 +9,9 @@ namespace App\Api\Controllers;
 
 
 use App\Config;
+use App\Log;
 use Illuminate\Http\Request;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ConfigController extends BaseController
 {
@@ -45,6 +47,10 @@ class ConfigController extends BaseController
                 return $this->responseError();
             }
         }
+
+        // 日志
+        $user = JWTAuth::user();
+        Log::add($user['id'], '更新系统设置');
 
         return $this->responseData();
     }

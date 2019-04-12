@@ -15,11 +15,9 @@ class CreateCardsTable extends Migration
     {
         Schema::create('cards', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('card_id')->comment('卡片id');
-            $table->tinyInteger('status')->default(0)->comment('卡片状态:0未激活 1已激活');
+            $table->string('number')->comment('卡片编号');
+            $table->tinyInteger('status')->default(0)->comment('卡片状态:0未激活 1已激活 2已挂失');
             $table->integer('member_id')->default(0)->comment('关联会员id');
-            $table->integer('created_by')->default(0)->comment('创建人');
-            $table->integer('updated_by')->default(0)->comment('更新人');
             $table->timestamps();
         });
     }

@@ -15,6 +15,14 @@ class ConfigsTableSeeder extends Seeder
     {
         DB::table('configs')->insert([
             [
+                'name' => '文旅惠民卡年费',
+                'datatype' => 'string',
+                'key' => 'Card.Price',
+                'value' => '100',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ],
+            [
                 'name' => '签到规则说明',
                 'datatype' => 'richtext',
                 'key' => 'Sign.Explain',

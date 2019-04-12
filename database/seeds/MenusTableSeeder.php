@@ -39,6 +39,12 @@ class MenusTableSeeder extends Seeder
                 'updated_at' => Carbon::now()
             ],
             [
+                'name' => '虚拟卡审核',
+                'value' => 'temp_member',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ],
+            [
                 'name' => '商品管理',
                 'value' => 'commodity',
                 'created_at' => Carbon::now(),

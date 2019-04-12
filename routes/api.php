@@ -61,6 +61,17 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
         // 菜单全部
         $api->post('menu_all', 'RoleController@menuAll');
 
+        // 会员列表
+        $api->post('member_list', 'MemberController@memberList');
+        // 会员详情
+        $api->post('member_detail', 'MemberController@memberDetail');
+        // 审核列表
+        $api->post('approve_list', 'MemberController@approveList');
+        // 审核操作
+        $api->post('approve_operate', 'MemberController@approveOperate');
+        // 卡片列表
+        $api->post('card_list', 'CardController@cardList');
+
         // 获取配置
         $api->post('get_config', 'ConfigController@getConfig');
         // 更新配置
