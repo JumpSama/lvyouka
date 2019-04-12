@@ -15,7 +15,7 @@ class CreateTempMembersTable extends Migration
     {
         Schema::create('temp_members', function (Blueprint $table) {
             $table->increments('id');
-            $table->tinyInteger('status')->default(0)->comment('状态:-1未支付 0待审核 1已拒绝');
+            $table->tinyInteger('status')->default(0)->comment('状态:0未支付 1待审核 2已拒绝');
             $table->string('name', 64)->comment('用户名');
             $table->tinyInteger('sex')->default(0)->comment('性别:0未知 1男 2女');
             $table->string('phone', 64)->unique()->comment('手机号');
@@ -24,6 +24,7 @@ class CreateTempMembersTable extends Migration
             $table->string('identity_reverse')->comment('身份证反面');
             $table->string('openid', 64)->unique()->comment('openid');
             $table->string('out_trade_no')->nullable()->comment('订单号');
+            $table->tinyInteger('deleted')->default(0)->comment('是否删除');
             $table->timestamps();
         });
     }

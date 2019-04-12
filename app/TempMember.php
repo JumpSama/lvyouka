@@ -8,9 +8,12 @@ use Illuminate\Support\Facades\DB;
 
 class TempMember extends Model
 {
-    const STATUS_NOT = -1;      //未支付
-    const STATUS_WAIT = 0;      //等待审核
-    const STATUS_REFUSE = 1;    //已拒绝
+    const STATUS_NOT = 0;      //未支付
+    const STATUS_WAIT = 1;      //等待审核
+    const STATUS_REFUSE = 2;    //已拒绝
+
+    const DELETED_NO = 0;   //未删除
+    const DELETED_YES = 1;  //已删除
 
     /**
      * 审核列表
@@ -23,7 +26,8 @@ class TempMember extends Model
     {
         $sql = DB::table('temp_members as a')
             ->select(['a.id', 'a.status', 'a.name', 'a.sex', 'a.phone', 'a.identity', 'a.identity_front', 'a.identity_reverse', 'b.id as member_id', 'b.name as member_name'])
-            ->leftJoin('members as b', 'a.identity', '=', 'b.identity');
+            ->leftJoin('members as b', 'a.identity', '=', 'b.identity')
+            ->where('a.deleted', self::DELETED_NO);
 
         if (isset($data['status'])) $sql = $sql->where('a.status', $data['status']);
         if (isset($data['name'])) $sql = $sql->where('a.name', 'like', '%' . $data['name'] . '%');
@@ -68,6 +72,7 @@ class TempMember extends Model
                     $member->overdue = Carbon::now()->addDays(365)->toDateString();
                 }
 
+                // 同步公众号端数据
                 $member->openid = $detail->openid;
                 $member->identity_front = $detail->identity_front;
                 $member->identity_reverse = $detail->identity_reverse;
@@ -75,11 +80,12 @@ class TempMember extends Model
 
                 $member->save();
 
+                // 删除临时表
+                $detail->deleted = self::DELETED_YES;
+                $detail->save();
+
                 // 日志
                 Log::add($userId, '审核通过用户-' . $detail->name . '(' . $detail->identity . '');
-
-                // 删除临时表
-                self::destroy($id);
             } else {
                 $detail->status = self::STATUS_REFUSE;
 
