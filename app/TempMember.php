@@ -25,7 +25,7 @@ class TempMember extends Model
     static public function approveList($data, $offset = 0, $limit = 10)
     {
         $sql = DB::table('temp_members as a')
-            ->select(['a.id', 'a.status', 'a.name', 'a.sex', 'a.phone', 'a.identity', 'a.identity_front', 'a.identity_reverse', 'b.id as member_id', 'b.name as member_name'])
+            ->select(['a.id', 'a.status', 'a.name', 'a.sex', 'a.phone', 'a.identity', 'a.identity_front', 'a.identity_reverse', 'b.id as member_id'])
             ->leftJoin('members as b', 'a.identity', '=', 'b.identity')
             ->where('a.deleted', self::DELETED_NO);
 
