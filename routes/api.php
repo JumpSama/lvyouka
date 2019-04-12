@@ -61,6 +61,10 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
         // 菜单全部
         $api->post('menu_all', 'RoleController@menuAll');
 
+        // 获取配置
+        $api->post('get_config', 'ConfigController@getConfig');
+        // 更新配置
+        $api->post('set_config', 'ConfigController@setConfig');
         // 日志列表
         $api->post('log_list', 'LogController@logList');
     });
