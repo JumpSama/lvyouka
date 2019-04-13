@@ -27,6 +27,7 @@ class CreateCommoditiesTable extends Migration
             $table->integer('sale_count')->default(0)->comment('销量');
             $table->integer('created_by')->default(0)->comment('创建人');
             $table->integer('updated_by')->default(0)->comment('更新人');
+            $table->tinyInteger('deleted')->default(0)->comment('是否删除');
             $table->timestamps();
         });
     }

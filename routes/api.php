@@ -72,6 +72,21 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
         // 卡片列表
         $api->post('card_list', 'CardController@cardList');
 
+        // 商品列表
+        $api->post('commodity_list', 'ShopController@commodityList');
+        // 商品保存
+        $api->post('commodity_store', 'ShopController@commodityStore');
+        // 商品详情
+        $api->post('commodity_detail', 'ShopController@commodityDetail');
+        // 商品删除
+        $api->post('commodity_del', 'ShopController@commodityDel');
+        // 商品操作
+        $api->post('commodity_operate', 'ShopController@commodityOperate');
+        // 订单列表
+        $api->post('order_list', 'ShopController@orderList');
+        // 订单操作
+        $api->post('order_operate', 'ShopController@orderOperate');
+
         // 获取配置
         $api->post('get_config', 'ConfigController@getConfig');
         // 更新配置

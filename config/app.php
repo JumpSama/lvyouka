@@ -226,4 +226,18 @@ return [
 
     ],
 
+    /**
+     * 图片文件后缀
+     */
+    'image_extensions' => env('IMAGE_EXTENSIONS'),
+
+    /**
+     * 图片服务器域名
+     */
+    'image_domain' => env('IMAGE_DOMAIN'),
+
+    /**
+     * 后台域名
+     */
+    'admin_domain' => env('ADMIN_DOMAIN')
 ];
