@@ -21,7 +21,7 @@ class CreateCommoditiesTable extends Migration
             $table->float('price', 18, 2)->default(0.00)->comment('商品价格');
             $table->tinyInteger('status')->default(1)->comment('商品状态:0下架 1上架');
             $table->string('image')->comment('商品主图');
-            $table->string('banner')->comment('商品轮播图');
+            $table->string('banner', 512)->comment('商品轮播图');
             $table->text('content')->comment('商品内容');
             $table->integer('stock')->default(0)->comment('库存');
             $table->integer('sale_count')->default(0)->comment('销量');
