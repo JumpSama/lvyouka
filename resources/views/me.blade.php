@@ -67,7 +67,7 @@
                     $('#cover2').hide();
 
                     if (res.code === 200) {
-                        $('.wm_open img').attr('src', res.data);
+                        $('.wm_open img').attr('src', res.data.url);
                         $(".cover,.wm_open").show();
                     } else {
                         alert('获取二维码失败');

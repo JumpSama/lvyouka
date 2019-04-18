@@ -150,7 +150,7 @@ class Member extends Model
     /**
      * 获取二维码地址
      * @param $id
-     * @return string
+     * @return array
      */
     static public function getQrCode($id)
     {
@@ -165,18 +165,18 @@ class Member extends Model
 
             Redis::set($key, $id);
             Redis::expire($key, 900);
-
-            $path = 'qrcode/' . self::datePath() . $key . '.png';
-        } else {
-            $path = 'qrcode/' . self::datePath() . $key . '.png';
         }
+
+        $path = 'qrcode/' . self::datePath() . $key . '.png';
 
         if (!Storage::exists($path)) {
             $image = QrCode::format('png')->size(250)->encoding('UTF-8')->generate($key);
             Storage::put($path, $image);
         }
 
-        return config('app.image_domain') . $path;
+        return [
+            'url' => config('app.image_domain') . $path
+        ];
     }
 
     /**
