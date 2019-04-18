@@ -170,7 +170,7 @@ class Member extends Model
         $path = 'qrcode/' . self::datePath() . $key . '.png';
 
         if (!Storage::exists($path)) {
-            $image = QrCode::format('png')->size(250)->encoding('UTF-8')->generate($key);
+            $image = QrCode::format('png')->size(250)->margin(0)->encoding('UTF-8')->generate($key);
             Storage::put($path, $image);
         }
 
