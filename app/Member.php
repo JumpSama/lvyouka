@@ -5,6 +5,9 @@ namespace App;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Storage;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class Member extends Model
 {
@@ -142,5 +145,50 @@ class Member extends Model
         if ($day > 7) $day = 7;
 
         return bcmul($day, 1, 0);
+    }
+
+    /**
+     * 获取二维码地址
+     * @param $id
+     * @return string
+     */
+    static public function getQrCode($id)
+    {
+        $flag = 'qr_code_' . $id;
+        $key = Redis::get($flag);
+
+        if (empty($key)) {
+            $key = str_random(20) . '_' . time();
+
+            Redis::set($flag, $key);
+            Redis::expire($flag, 900);
+
+            Redis::set($key, $id);
+            Redis::expire($key, 900);
+
+            $path = 'qrcode/' . self::datePath() . $key . '.png';
+        } else {
+            $path = 'qrcode/' . self::datePath() . $key . '.png';
+        }
+
+        if (!Storage::exists($path)) {
+            $image = QrCode::format('png')->size(250)->encoding('UTF-8')->generate($key);
+            Storage::put($path, $image);
+        }
+
+        return config('app.image_domain') . $path;
+    }
+
+    /**
+     * 日期路径
+     * @return string
+     */
+   static public function datePath()
+    {
+        $now = Carbon::now();
+        $year = $now->year;
+        $month = $now->month;
+        if ($month < 10) $month = 0 . $month;
+        return $year . '/' . $month . '/';
     }
 }

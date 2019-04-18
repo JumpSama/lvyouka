@@ -43,16 +43,37 @@
     </div>
 
     <!--  弹出二维码 -->
-    <div class="wm_open"><img src="{{asset('images/pay_img.png')}}"></div>
+    <div class="wm_open"><img src=""></div>
 
     <!--  遮罩层 -->
     <div class="cover"></div>
+
+    <!-- 加载遮罩 -->
+    <div id="cover2" class="cover2">
+        <div class="loading"></div>
+    </div>
 </div>
 
 <script type="text/javascript">
     $(document).ready(function(){
         $(".wx_btn").click(function(){
-            $(".cover,.wm_open").show();
+            $('#cover2').show();
+
+            $.ajax({
+                type: 'post',
+                url: 'qr_code',
+                dataType: 'json',
+                success: function (res) {
+                    $('#cover2').hide();
+
+                    if (res.code === 200) {
+                        $('.wm_open img').attr('src', res.data);
+                        $(".cover,.wm_open").show();
+                    } else {
+                        alert('获取二维码失败');
+                    }
+                }
+            });
         });
 
         $(".cover,.wm_open").click(function(){

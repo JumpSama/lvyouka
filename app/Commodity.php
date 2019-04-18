@@ -178,6 +178,12 @@ class Commodity extends Model
         }
     }
 
+    /**
+     * 商品购买
+     * @param $id
+     * @param $memberId
+     * @return bool|string
+     */
     static public function buy($id, $memberId)
     {
         DB::beginTransaction();

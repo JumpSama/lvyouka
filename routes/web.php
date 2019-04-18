@@ -49,4 +49,6 @@ Route::prefix('wechat')->group(function () {
     Route::post('commodity_buy', 'WechatController@commodityBuy');
     // 订单列表
     Route::post('order_list', 'WechatController@orderList');
+    // 二维码
+    Route::post('qr_code', 'WechatController@qrCode');
 });

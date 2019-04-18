@@ -210,6 +210,17 @@ class WechatController extends BaseController
     }
 
     /**
+     * 获取二维码地址
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function qrCode()
+    {
+        $member = $this->getMember();
+
+        return $this->responseData(Member::getQrCode($member->id));
+    }
+
+    /**
      * 商品详情页
      * @param Request $request
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\View\View

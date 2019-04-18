@@ -105,7 +105,7 @@
                             '<div class="num">库存剩余：' + this.stock + '件</div>' +
                             '<div class="bt">' +
                             '<div class="integral"><em>' + parseInt(this.price) + '</em>积分</div>' +
-                            '<a href="detail?id=' + this.id +'">立即兑换</a>' +
+                            '<a href="detail?id=' + this.id +'">商品详情</a>' +
                             '</div>' +
                             '</div>' +
                             '</li>';
