@@ -21,6 +21,7 @@ class CreateCardOrdersTable extends Migration
             $table->string('prepay_id', 64)->nullable()->comment('预支付ID');
             $table->string('out_trade_no', 64)->comment('订单号');
             $table->string('transaction_id', 64)->nullable()->comment('微信订单号');
+            $table->string('refund_number', 64)->nullable()->comment('退款单号');
             $table->timestamps();
         });
     }

@@ -250,4 +250,29 @@ return [
      * 中文名称
      */
     'name_cn' => env('APP_NAME_CN', '文旅惠民卡'),
+
+    /**
+     * 短信验证码超时时间（分钟）
+     */
+    'sms_overdue' => env('SMS_OVERDUE', 30),
+
+    /**
+     * 阿里云短信Access Key
+     */
+    'sms_key' => env('SMS_ACCESS_KEY_ID'),
+
+    /**
+     * 阿里云短信Access Key Secret
+     */
+    'sms_secret' => env('SMS_ACCESS_KEY_SECRET'),
+
+    /**
+     * 阿里云短信签名
+     */
+    'sms_sign' => env('SMS_SIGN_NAME'),
+
+    /**
+     * 阿里云验证码模板CODE
+     */
+    'sms_template' => env('SMS_TEMPLATE_CODE'),
 ];

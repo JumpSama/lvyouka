@@ -87,7 +87,8 @@ class TempMember extends Model
 
                 // 退款
                 if (!$member) {
-                    // TODO 退款
+                    $pay = new PayController();
+                    $pay->cardRefund($detail->out_trade_no);
                 }
 
                 $detail->save();

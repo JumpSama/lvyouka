@@ -51,4 +51,6 @@ Route::prefix('wechat')->group(function () {
     Route::post('order_list', 'WechatController@orderList');
     // 二维码
     Route::post('qr_code', 'WechatController@qrCode');
+    // 短信验证码发送
+    Route::post('send_sms', 'WechatController@sendSms');
 });

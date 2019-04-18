@@ -16,7 +16,7 @@ class CreatePointFlowsTable extends Migration
         Schema::create('point_flows', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('member_id')->comment('用户id');
-            $table->tinyInteger('type')->comment('类型');
+            $table->tinyInteger('type')->comment('类型:1.签到 2.购物');
             $table->integer('ref_id')->default(0)->comment('主表id');
             $table->decimal('amount', 18, 2)->comment('数额');
             $table->integer('created_by')->default(0)->comment('创建人');

@@ -49,11 +49,11 @@
             </div>
             <div class="input_box">
                 <span>手机号</span>
-                <input type="tel" class="i1" placeholder="请填写使用人手机号" name="phone" value="{{$memberInfo['phone']}}">
+                <input type="tel" class="i1" placeholder="请填写使用人手机号" name="phone" id="phone" value="{{$memberInfo['phone']}}">
             </div>
             <div class="input_box">
                 <span>验证码</span>
-                <input class="i2" type="text" placeholder="请填写手机验证码">
+                <input class="i2" type="text" placeholder="请填写手机验证码" name="code">
                 <input class="b1" type="button" value="发送验证码" id="send">
             </div>
             <div class="input_box">
@@ -97,6 +97,7 @@
 </div>
 
 <script type="text/javascript">
+    var countTime = 60;
     var id = '{{$memberInfo['id']}}';
     var jsConfig = JSON.parse(@json($jsConfig));
     wx.config(jsConfig);
@@ -104,8 +105,8 @@
     var fields = {
         'name' : '请填写姓名',
         'sex' : '请选择性别',
-        'identity' : '请填写身份证',
-        'phone' : '请填写手机号',
+        'identity' : '请填写正确的身份证号',
+        'phone' : '请填写正确的手机号',
         'code' : '请填写手机验证码',
         'identity_front' : '请上传身份证正面',
         'identity_reverse' : '请上传身份证反面'
@@ -143,6 +144,68 @@
         })
     }
 
+    // 短信验证码
+    $('#send').on('click', function () {
+        if ($(this).val() !== '发送验证码') return false;
+
+        var phone = $('#phone').val();
+
+        if (!checkPhone(phone)) {
+            alert('请输入正确的手机号');
+            return false;
+        }
+
+        $('#cover').show();
+
+        $.ajax({
+            type: 'post',
+            data: {
+                phone: phone
+            },
+            url: 'send_sms',
+            dataType: 'json',
+            success: function (res) {
+                $('#cover').hide();
+
+                if (res.code === 200) {
+                    countDown();
+                    alert('发送成功');
+                } else {
+                    alert('发送失败');
+                }
+            }
+        })
+    });
+
+    // 倒计时
+    function countDown() {
+        var sendBtn = $('#send');
+
+        if (countTime < 1) {
+            sendBtn.val('发送验证码');
+            countTime = 60;
+            return false;
+        }
+
+        sendBtn.val(countTime);
+
+        countTime--;
+
+        setTimeout(function () {
+            countDown();
+        }, 1000);
+    }
+
+    // 校验身份证
+    function checkIdentity(value) {
+        return /^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$|^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/.test(value);
+    }
+
+    // 校验手机号
+    function checkPhone(value) {
+        return /^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\d{8}$/.test(value);
+    }
+
     // 提交
     $('#submit').on('click', function () {
         var flag = false;
@@ -151,6 +214,14 @@
 
         $(formData).each(function () {
             if (!this.value || this.value === '') {
+                flag = this.name;
+                return false;
+            }
+            if (this.name === 'identity' && !checkIdentity(this.value)) {
+                flag = this.name;
+                return false;
+            }
+            if (this.name === 'phone' && !checkPhone(this.value)) {
                 flag = this.name;
                 return false;
             }

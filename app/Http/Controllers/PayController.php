@@ -77,6 +77,26 @@ class PayController extends BaseController
     }
 
     /**
+     * 退款
+     * @param $out_trade_no
+     * @return mixed
+     */
+    public function cardRefund($out_trade_no)
+    {
+        $order = CardOrder::where('out_trade_no', $out_trade_no)->first();
+
+        $refundNumber = str_random(20) . '-' . time();
+
+        $fee = $this->getFee($order->amount);
+
+        $this->pay->refund->byOutTradeNumber($out_trade_no, $refundNumber, $fee, $fee);
+
+        $order->refund_number = $refundNumber;
+
+        return $order->save();
+    }
+
+    /**
      * 卡片开卡回调
      * @return mixed
      */

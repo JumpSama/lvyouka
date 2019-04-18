@@ -13,6 +13,7 @@ use App\Commodity;
 use App\Member;
 use App\Order;
 use App\PointFlow;
+use App\SmsRecord;
 use App\TempMember;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -96,9 +97,13 @@ class WechatController extends BaseController
      */
     public function apply(Request $request)
     {
-        $fields = ['name', 'sex', 'identity', 'phone', 'identity_front', 'identity_reverse'];
+        $fields = ['name', 'sex', 'identity', 'phone', 'identity_front', 'identity_reverse', 'code'];
 
         if (!$request->filled($fields)) return $this->responseError('参数错误');
+
+        $sms = SmsRecord::checkCode($request->input('phone'), $request->input('code'));
+
+        if ($sms !== true)  return $this->responseError($sms);
 
         $data = $request->only($fields);
 
@@ -218,6 +223,22 @@ class WechatController extends BaseController
         $member = $this->getMember();
 
         return $this->responseData(Member::getQrCode($member->id));
+    }
+
+    /**
+     * 发送短信验证码
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function sendSms(Request $request)
+    {
+        if (!$request->filled('phone')) return $this->responseError('参数错误');
+
+        $sms = SmsRecord::sendCode($request->input('phone'));
+
+        if ($sms !== true) return $this->responseError();
+
+        return $this->responseData();
     }
 
     /**
