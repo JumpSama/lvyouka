@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
@@ -61,5 +62,85 @@ class Member extends Model
         }
 
         return [];
+    }
+
+    /**
+     * 检查信息是否一致
+     * @param $data
+     * @return mixed
+     */
+    static public function checkParams($data)
+    {
+        return self::where('identity', $data['identity'])
+            ->where('name', $data['name'])
+            ->where('sex', $data['sex'])
+            ->where('phone', $data['phone'])
+            ->where('name', $data['name'])
+            ->whereNull('openid')->count() > 0;
+    }
+
+    /**
+     * 会员签到
+     * @param $openid
+     * @return bool
+     */
+    static public function signIn($openid)
+    {
+        DB::beginTransaction();
+
+        try {
+            $member = self::where('openid', $openid)->first();
+
+            $today = Carbon::today()->toDateString();
+
+            if ($member->sign_date != $today) {
+                $yesterday = Carbon::today()->subDay()->toDateString();
+
+                $signDate = $member->sign_date;
+
+                // 连续签到
+                if ($yesterday == $signDate) {
+                    $signDay = $member->sign_day + 1;
+                    $member->sign_day = $signDay;
+                } else {
+                    $signDay = 1;
+                    $member->sign_day = $signDay;
+                }
+
+                $point = self::getPoint($signDay);
+
+                $member->point = bcadd($member->point, $point, 2);
+
+                $member->sign_date = $today;
+
+                $member->save();
+
+                // 签到记录
+                SignRecord::add($member->id, $today, $point);
+
+                // 积分记录
+                PointFlow::add($member->id, 1, $point);
+
+                DB::commit();
+                return true;
+            } else {
+                throw new \Exception('已签到');
+            }
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return false;
+        }
+    }
+
+    /**
+     * 获取当天积分
+     * @param $day
+     * @return string
+     */
+    static public function getPoint($day)
+    {
+        if ($day > 7) $day = 7;
+
+        return bcmul($day, 1, 0);
     }
 }

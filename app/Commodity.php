@@ -46,6 +46,29 @@ class Commodity extends Model
     }
 
     /**
+     * 前台商品列表
+     * @param $data
+     * @param int $offset
+     * @param int $limit
+     * @return array
+     */
+    static public function getList($data, $offset = 0, $limit = 10)
+    {
+        $sql = self::select(['id', 'name', 'price', 'image', 'stock'])->where('status', self::STATUS_UP)->where('deleted', self::DELETED_NO);
+
+        $sort = 'asc';
+        if (isset($data['sort']) && $data['sort'] == 'down') $sort = 'desc';
+
+        $total = $sql->count();
+        $list = $sql->orderBy('price', $sort)->offset($offset)->limit($limit)->get();
+
+        return [
+            'list' => $list,
+            'total' => $total
+        ];
+    }
+
+    /**
      * 商品保存
      * @param $data
      * @param $userId
@@ -152,6 +175,44 @@ class Commodity extends Model
         } catch (\Exception $exception) {
             DB::rollBack();
             return false;
+        }
+    }
+
+    static public function buy($id, $memberId)
+    {
+        DB::beginTransaction();
+
+        try {
+            $commodity = self::find($id);
+
+            if ($commodity->status != self::STATUS_UP || $commodity->deleted != self::DELETED_NO) throw new \Exception('商品已下架');
+
+            if ($commodity->stock < 1) throw new \Exception('库存不足');
+
+            $member = Member::find($memberId);
+
+            if ($commodity->price > $member->point) throw new \Exception('积分不足');
+
+            // 库存销量
+            $commodity->stock -= 1;
+            $commodity->sale_count += 1;
+            $commodity->save();
+
+            // 扣除积分
+            $member->point = bcsub($member->point, $commodity->price, 2);
+            $member->save();
+
+            // 生成订单
+            Order::add($memberId, $id, $commodity->price);
+
+            // 积分记录
+            PointFlow::add($memberId, PointFlow::TYPE_BUY, bcmul($commodity->price, -1, 2), $id);
+
+            DB::commit();
+            return true;
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return $exception->getMessage();
         }
     }
 }

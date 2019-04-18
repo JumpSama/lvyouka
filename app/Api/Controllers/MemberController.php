@@ -11,6 +11,7 @@ namespace App\Api\Controllers;
 use App\Member;
 use App\TempMember;
 use Illuminate\Http\Request;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class MemberController extends BaseController
 {
@@ -69,8 +70,19 @@ class MemberController extends BaseController
         return $this->responseData($list);
     }
 
+    /**
+     * 审核操作
+     * @param Request $request
+     * @return mixed
+     */
     public function approveOperate(Request $request)
     {
+        if(!$request->filled(['id', 'type'])) return $this->responseError([], '参数错误');
 
+        $user = JWTAuth::user();
+
+        if (TempMember::approveOperate($request->input('id'), $request->input('type'), $user['id'])) return $this->responseData();
+
+        return $this->responseError();
     }
 }

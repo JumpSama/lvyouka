@@ -239,5 +239,15 @@ return [
     /**
      * 后台域名
      */
-    'admin_domain' => env('ADMIN_DOMAIN')
+    'admin_domain' => env('ADMIN_DOMAIN'),
+
+    /**
+     * 未关注时跳转的引导页
+     */
+    'guide_url' => env('GUIDE_URL', 'https://www.baidu.com'),
+
+    /**
+     * 中文名称
+     */
+    'name_cn' => env('APP_NAME_CN', '文旅惠民卡'),
 ];

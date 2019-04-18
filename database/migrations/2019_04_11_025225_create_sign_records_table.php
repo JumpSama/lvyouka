@@ -15,8 +15,9 @@ class CreateSignRecordsTable extends Migration
     {
         Schema::create('sign_records', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('user_id')->comment('用户id');
+            $table->integer('member_id')->comment('用户id');
             $table->date('sign_date')->comment('签到日期');
+            $table->decimal('point', 18, 2)->comment('获取积分');
             $table->timestamps();
         });
     }

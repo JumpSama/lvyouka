@@ -15,10 +15,11 @@ class CreateCardOrdersTable extends Migration
     {
         Schema::create('card_orders', function (Blueprint $table) {
             $table->increments('id');
-            $table->tinyInteger('status')->default(0)->comment('状态:0未支付 1已支付');
+            $table->tinyInteger('status')->default(0)->comment('状态:0未支付 1已支付 2已退款');
             $table->string('identity', 64)->comment('身份证号');
             $table->decimal('amount', 18, 2)->default(0)->comment('金额');
-            $table->string('out_trade_no', 64)->nullable()->comment('订单号');
+            $table->string('prepay_id', 64)->nullable()->comment('预支付ID');
+            $table->string('out_trade_no', 64)->comment('订单号');
             $table->string('transaction_id', 64)->nullable()->comment('微信订单号');
             $table->timestamps();
         });

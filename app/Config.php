@@ -39,4 +39,17 @@ class Config extends Model
 
         return $sql->save();
     }
+
+    /**
+     * 获取配置项
+     * @param $key
+     * @param string $default
+     * @return string
+     */
+    static public function get($key, $default = '')
+    {
+        $sql = self::select(['value'])->where('key', $key)->first();
+
+        return $sql ? $sql->value : $default;
+    }
 }
