@@ -27,6 +27,12 @@ class MenusTableSeeder extends Seeder
                 'updated_at' => Carbon::now()
             ],
             [
+                'name' => '场所管理',
+                'value' => 'site',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ],
+            [
                 'name' => '卡片管理',
                 'value' => 'card',
                 'created_at' => Carbon::now(),
@@ -41,6 +47,12 @@ class MenusTableSeeder extends Seeder
             [
                 'name' => '虚拟卡审核',
                 'value' => 'temp_member',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ],
+            [
+                'name' => '刷卡',
+                'value' => 'use_card',
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
             ],

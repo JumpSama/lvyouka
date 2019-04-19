@@ -34,4 +34,20 @@ class CardController extends BaseController
 
         return $this->responseData($list);
     }
+
+    /**
+     * 卡片录入
+     * @param Request $request
+     * @return mixed
+     */
+    public function cardAdd(Request $request)
+    {
+        if (!$request->filled('number')) return $this->responseError([], '参数错误');
+
+        $data = $request->only(['number']);
+
+        if (Card::add($data)) return $this->responseData();
+
+        return $this->responseError();
+    }
 }

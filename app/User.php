@@ -152,6 +152,7 @@ class User extends Authenticatable implements JWTSubject
             $sql->role = $data['role'];
             $sql->account = $data['account'];
             $sql->updated_by = $userId;
+            if (isset($data['site'])) $sql->site = $data['site'];
             $sql->save();
 
             // 日志

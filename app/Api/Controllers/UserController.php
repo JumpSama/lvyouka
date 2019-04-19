@@ -45,7 +45,7 @@ class UserController extends BaseController
     {
         if (!$request->has(['name', 'account', 'role'])) return $this->responseError([], '参数错误');
 
-        $data = $request->only(['id', 'name', 'account', 'role']);
+        $data = $request->only(['id', 'name', 'account', 'role', 'site']);
 
         $user = JWTAuth::user();
 

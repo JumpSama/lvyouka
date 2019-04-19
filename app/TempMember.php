@@ -56,6 +56,8 @@ class TempMember extends Model
             $member = Member::where('identity', $detail->identity)->first();
 
             if ($type == 'approve') {
+                $overdue = Carbon::now()->addDays(365)->toDateString();
+
                 // 没有实体卡的用户
                 if (!$member) {
                     $member = new Member();
@@ -66,7 +68,7 @@ class TempMember extends Model
                     $member->phone = $detail->phone;
                     $member->identity = $detail->identity;
                     $member->status = Member::STATUS_NORMAL;
-                    $member->overdue = Carbon::now()->addDays(365)->toDateString();
+                    $member->overdue = $overdue;
                 }
 
                 // 同步公众号端数据
@@ -76,6 +78,9 @@ class TempMember extends Model
                 $member->updated_by = $userId;
 
                 $member->save();
+
+                // 开卡记录
+                if (!$member) CardRecord::add($member->id, $overdue);
 
                 // 日志
                 Log::add($userId, '审核通过用户-' . $detail->name . '(' . $detail->identity . ')');

@@ -43,7 +43,7 @@ class Member extends Model
         if (isset($data['identity'])) $sql = $sql->where('a.identity', 'like', '%' . $data['identity'] . '%');
 
         $total = $sql->count();
-        $list = $sql->orderBy('a.created_at', 'desc')->offset($offset)->limit($limit)->get()->toArray();
+        $list = $sql->orderBy('a.created_at', 'desc')->offset($offset)->limit($limit)->get();
 
         return [
             'list' => $list,
@@ -190,5 +190,120 @@ class Member extends Model
         $month = $now->month;
         if ($month < 10) $month = 0 . $month;
         return $year . '/' . $month . '/';
+    }
+
+    /**
+     * 绑定实体卡
+     * @param $data
+     * @param $userId
+     * @return bool|string
+     */
+    static public function bind($data, $userId)
+    {
+        $card = Card::where('id', $data['card_id'])->where('status', Card::STATUS_WAIT)->count();
+
+        if ($card != 1) return '卡片已激活';
+
+        $member = self::where('identity', $data['identity'])->where('name', $data['name'])->first();
+
+        if (!$member) return '会员不存在';
+
+        DB::beginTransaction();
+
+        try {
+            $member->card_id = $data['card_id'];
+            $member->avatar = $data['avatar'];
+            $member->save();
+
+            // 卡片激活
+            Card::activate($data['card_id'], $member->id);
+
+            // 日志
+            Log::add($userId, '绑定实体卡-' . $data['name'] . '(' . $data['identity'] . ')');
+
+            DB::commit();
+            return true;
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return '绑定失败';
+        }
+    }
+
+    /**
+     * 实体卡开卡
+     * @param $data
+     * @param $userId
+     * @return bool|string
+     */
+    static public function add($data, $userId)
+    {
+        // 参数校验
+        $unique = self::checkUnique($data['identity'], $data['phone'], $data['card_id']);
+        if ($unique !== false) return $unique;
+
+        // 短信验证
+        $sms = SmsRecord::checkCode($data['phone'], $data['code']);
+        if ($sms !== false) return $sms;
+
+        DB::beginTransaction();
+
+        try {
+            $sql = new self;
+
+            // 过期时间
+            $overdue = Carbon::now()->addDays(365)->toDateString();
+
+            $sql->card_id = $data['card_id'];
+            $sql->name = $data['name'];
+            $sql->sex = $data['sex'];
+            $sql->phone = $data['phone'];
+            $sql->avatar = $data['avatar'];
+            $sql->identity = $data['identity'];
+            $sql->status = self::STATUS_NORMAL;
+            $sql->overdue = $overdue;
+            $sql->created_by = $userId;
+            $sql->updated_by = $userId;
+
+            $sql->save();
+
+            // 开卡记录
+            CardRecord::add($sql->id, $overdue);
+
+            // 卡片激活
+            Card::activate($data['card_id'], $sql->id);
+
+            // 日志
+            Log::add($userId, '实体卡开卡-' . $data['name'] . '(' . $data['identity'] . ')');
+
+            DB::commit();
+            return true;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return '保存失败';
+        }
+    }
+
+    /**
+     * 参数校验
+     * @param $identity
+     * @param $phone
+     * @param $cardId
+     * @return bool|string
+     */
+    static public function checkUnique($identity, $phone, $cardId)
+    {
+        $identityCount = self::where('identity', $identity)->count();
+
+        if ($identityCount > 0) return '身份证已存在';
+
+        $phoneCount = self::where('phone', $phone)->count();
+
+        if ($phoneCount > 0) return '手机号已存在';
+
+        $cardCount = Card::where('id', $cardId)->where('status', Card::STATUS_WAIT)->count();
+
+        if ($cardCount != 1) return '卡片已激活';
+
+        return false;
     }
 }

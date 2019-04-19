@@ -37,4 +37,34 @@ class Card extends Model
             'total' => $total
         ];
     }
+
+    /**
+     * 卡片激活
+     * @param $id
+     * @param $memberId
+     * @return mixed
+     */
+    static public function activate($id, $memberId)
+    {
+        $sql = self::find($id);
+
+        $sql->status = self::STATUS_NORMAL;
+        $sql->member_id = $memberId;
+
+        return $sql->save();
+    }
+
+    /**
+     * 卡片录入
+     * @param $data
+     * @return bool
+     */
+    static public function add($data)
+    {
+        $sql = new self;
+
+        $sql->number = $data['number'];
+
+        return $sql->save();
+    }
 }

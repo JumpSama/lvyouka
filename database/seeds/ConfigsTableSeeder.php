@@ -23,6 +23,14 @@ class ConfigsTableSeeder extends Seeder
                 'updated_at' => Carbon::now()
             ],
             [
+                'name' => '单次刷卡奖励积分',
+                'datatype' => 'string',
+                'key' => 'Card.Award',
+                'value' => '100',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ],
+            [
                 'name' => '签到规则说明',
                 'datatype' => 'richtext',
                 'key' => 'Sign.Explain',

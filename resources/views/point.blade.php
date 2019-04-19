@@ -54,7 +54,8 @@
         },
         pointType = {
             1: '签到',
-            2: '购物'
+            2: '购物',
+            3: '刷卡'
         };
 
     $(document).ready(function(){

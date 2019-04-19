@@ -61,6 +61,18 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
         // 菜单全部
         $api->post('menu_all', 'RoleController@menuAll');
 
+        // 场所列表
+        $api->post('site_list', 'SiteController@siteList');
+        // 场所全部
+        $api->post('site_all', 'SiteController@siteAll');
+        // 场所保存
+        $api->post('site_store', 'SiteController@siteStore');
+        // 场所详情
+        $api->post('site_detail', 'SiteController@siteDetail');
+        // 场所删除
+        $api->post('site_del', 'SiteController@siteDel');
+
+
         // 会员列表
         $api->post('member_list', 'MemberController@memberList');
         // 会员详情
@@ -93,5 +105,14 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
         $api->post('set_config', 'ConfigController@setConfig');
         // 日志列表
         $api->post('log_list', 'LogController@logList');
+
+        // 卡片录入
+        $api->post('card_add', 'CardController@cardAdd');
+        // 开卡
+        $api->post('card_to_member', 'MemberController@cardToMember');
+        // 绑卡
+        $api->post('card_bind_member', 'MemberController@cardBindMember');
+        // 卡片使用记录
+        $api->post('card_use_log', 'MemberController@cardUseLog');
     });
 });

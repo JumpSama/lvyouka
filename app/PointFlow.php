@@ -8,6 +8,7 @@ class PointFlow extends Model
 {
     const TYPE_SIGN = 1;    // 签到
     const TYPE_BUY = 2;    // 购物
+    const TYPE_USE = 3;    // 刷卡
 
     /**
      * The attributes that should be hidden for arrays.

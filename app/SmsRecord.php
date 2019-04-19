@@ -26,11 +26,7 @@ class SmsRecord extends Model
     {
         $sms = self::where('phone', $phone)->orderBy('created_at', 'desc')->first();
 
-        if (!$sms) {
-            return '记录不存在';
-        }
-
-        if ($sms->status != self::STATUS_NORMAL) {
+        if (!$sms || $sms->status != self::STATUS_NORMAL) {
             return '验证码无效';
         }
 
@@ -77,8 +73,6 @@ class SmsRecord extends Model
         $sql->type = 1;
         $sql->phone = $phone;
         $sql->code = $code;
-
-        $sql->save();
 
         if (!$sql->save()) return false;
 
