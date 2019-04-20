@@ -16,7 +16,7 @@ class CreateMenusTable extends Migration
         Schema::create('menus', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->comment('菜单名称');
-            $table->string('value')->unique()->comment('菜单');
+            $table->string('value', 64)->unique()->comment('菜单');
             $table->timestamps();
         });
     }
