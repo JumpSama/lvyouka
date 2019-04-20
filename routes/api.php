@@ -112,7 +112,13 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
         $api->post('card_to_member', 'MemberController@cardToMember');
         // 绑卡
         $api->post('card_bind_member', 'MemberController@cardBindMember');
+        // 挂失绑定新卡
+        $api->post('card_change_member', 'MemberController@cardChangeMember');
         // 卡片使用记录
         $api->post('card_use_log', 'MemberController@cardUseLog');
+        // 刷卡
+        $api->post('card_use_log_add', 'MemberController@cardUseLogAdd');
+        // 短信验证码发送
+        $api->post('send_sms', 'MemberController@sendSms');
     });
 });

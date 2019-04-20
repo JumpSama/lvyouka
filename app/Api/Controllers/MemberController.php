@@ -13,6 +13,7 @@ use App\Member;
 use App\SmsRecord;
 use App\TempMember;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class MemberController extends BaseController
@@ -95,13 +96,33 @@ class MemberController extends BaseController
      */
     public function cardToMember(Request $request)
     {
-        if (!$request->filled(['card_id', 'name', 'sex', 'phone', 'avatar', 'identity', 'code'])) return $this->responseError([], '参数错误');
+        if (!$request->filled(['card_number', 'name', 'sex', 'phone', 'avatar', 'identity', 'code'])) return $this->responseError([], '参数错误');
 
         $user = JWTAuth::user();
 
-        $data = $request->only(['card_id', 'name', 'sex', 'phone', 'avatar', 'identity', 'code']);
+        $data = $request->only(['card_number', 'name', 'sex', 'phone', 'avatar', 'identity', 'code']);
 
         $result = Member::add($data, $user['id']);
+
+        if ($result !== true) return $this->responseError([], $result);
+
+        return $this->responseData();
+    }
+
+    /**
+     * 挂失绑定新卡
+     * @param Request $request
+     * @return mixed
+     */
+    public function cardChangeMember(Request $request)
+    {
+        if (!$request->filled(['card_number', 'identity'])) return $this->responseError([], '参数错误');
+
+        $user = JWTAuth::user();
+
+        $data = $request->only(['card_number', 'identity']);
+
+        $result = Member::change($data, $user['id']);
 
         if ($result !== true) return $this->responseError([], $result);
 
@@ -115,11 +136,11 @@ class MemberController extends BaseController
      */
     public function cardBindMember(Request $request)
     {
-        if (!$request->filled(['card_id', 'name', 'avatar', 'identity'])) return $this->responseError([], '参数错误');
+        if (!$request->filled(['card_number', 'identity', 'avatar'])) return $this->responseError([], '参数错误');
 
         $user = JWTAuth::user();
 
-        $data = $request->only(['card_id', 'name', 'avatar', 'identity']);
+        $data = $request->only(['card_number', 'identity', 'avatar']);
 
         $result = Member::bind($data, $user['id']);
 
@@ -135,11 +156,11 @@ class MemberController extends BaseController
      */
     public function cardUseLog(Request $request)
     {
-        if (!$request->filled(['card_id'])) return $this->responseError([], '参数错误');
+        if (!$request->filled(['card_number'])) return $this->responseError([], '参数错误');
 
         $user = JWTAuth::user();
 
-        $list = CardUsedRecord::getLog($request->input('card_id'), $user['id']);
+        $list = CardUsedRecord::getLog($request->input('card_number'), $user['id']);
 
         if (isset($list['msg'])) return $this->responseError([], $list['msg']);
 
@@ -153,13 +174,29 @@ class MemberController extends BaseController
      */
     public function cardUseLogAdd(Request $request)
     {
-        if (!$request->filled(['card_id', 'item_id'])) return $this->responseError([], '参数错误');
+        if (!$request->filled(['member_id', 'item_id'])) return $this->responseError([], '参数错误');
 
         $user = JWTAuth::user();
 
-        $result = CardUsedRecord::add($request->input('card_id'), $user['id'], $request->input('item_id'));
+        $result = CardUsedRecord::add($request->input('member_id'), $user['id'], $request->input('item_id'));
 
         if ($result !== true) return $this->responseError([], $result);
+
+        return $this->responseData();
+    }
+
+    /**
+     * 发送短信
+     * @param Request $request
+     * @return mixed
+     */
+    public function sendSms(Request $request)
+    {
+        if (!$request->filled('phone')) return $this->responseError('参数错误');
+
+        $sms = SmsRecord::sendCode($request->input('phone'));
+
+        if ($sms !== true) return $this->responseError();
 
         return $this->responseData();
     }

@@ -44,6 +44,8 @@ class CardController extends BaseController
     {
         if (!$request->filled('number')) return $this->responseError([], '参数错误');
 
+        if (Card::where('number', $request->input('number'))->count() > 0) return $this->responseError([], '卡片已存在');
+
         $data = $request->only(['number']);
 
         if (Card::add($data)) return $this->responseData();

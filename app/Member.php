@@ -193,6 +193,49 @@ class Member extends Model
     }
 
     /**
+     * 挂失绑定新卡
+     * @param $data
+     * @param $userId
+     * @return bool|string
+     */
+    static public function change($data, $userId)
+    {
+        $card = Card::where('number', $data['card_number'])->first();
+
+        if (!$card) return '卡片不存在';
+
+        if ($card->status != Card::STATUS_WAIT) return '卡片已绑定其他会员';
+
+        $member = self::where('identity', $data['identity'])->first();
+
+        if (!$member) return '会员不存在';
+
+        if (empty($member->card_id)) return '会员未绑定其他卡';
+
+        DB::beginTransaction();
+
+        try {
+            // 卡片挂失
+            Card::lost($member->card_id);
+
+            $member->card_id = $card->id;
+            $member->save();
+
+            // 卡片激活
+            Card::activate($card->id, $member->id);
+
+            // 日志
+            Log::add($userId, '会员挂失实体卡-' . $member->name . '(' . $data['identity'] . ')');
+
+            DB::commit();
+            return true;
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return '绑定失败';
+        }
+    }
+
+    /**
      * 绑定实体卡
      * @param $data
      * @param $userId
@@ -200,26 +243,35 @@ class Member extends Model
      */
     static public function bind($data, $userId)
     {
-        $card = Card::where('id', $data['card_id'])->where('status', Card::STATUS_WAIT)->count();
+        $card = Card::where('number', $data['card_number'])->first();
 
-        if ($card != 1) return '卡片已激活';
+        if (!$card) return '卡片不存在';
 
-        $member = self::where('identity', $data['identity'])->where('name', $data['name'])->first();
+        if ($card->status != Card::STATUS_WAIT) return '卡片已绑定其他会员';
+
+        $member = self::where('identity', $data['identity'])->first();
 
         if (!$member) return '会员不存在';
+
+        if (!empty($member->card_id)) return '会员已绑定其他卡';
 
         DB::beginTransaction();
 
         try {
-            $member->card_id = $data['card_id'];
-            $member->avatar = $data['avatar'];
+            // 存储头像
+            $path = 'identity/' . self::datePath() . $data['identity'] . '.png';
+            $avatar = substr($data['avatar'], strpos($data['avatar'], ',') + 1);
+            Storage::put($path, base64_decode($avatar));
+
+            $member->card_id = $card->id;
+            $member->avatar = config('app.image_domain') . $avatar;
             $member->save();
 
             // 卡片激活
-            Card::activate($data['card_id'], $member->id);
+            Card::activate($card->id, $member->id);
 
             // 日志
-            Log::add($userId, '绑定实体卡-' . $data['name'] . '(' . $data['identity'] . ')');
+            Log::add($userId, '绑定实体卡-' . $member->name . '(' . $data['identity'] . ')');
 
             DB::commit();
             return true;
@@ -238,12 +290,12 @@ class Member extends Model
     static public function add($data, $userId)
     {
         // 参数校验
-        $unique = self::checkUnique($data['identity'], $data['phone'], $data['card_id']);
-        if ($unique !== false) return $unique;
+        $unique = self::checkUnique($data['identity'], $data['phone'], $data['card_number']);
+        if ($unique !== true) return $unique;
 
         // 短信验证
         $sms = SmsRecord::checkCode($data['phone'], $data['code']);
-        if ($sms !== false) return $sms;
+        if ($sms !== true) return $sms;
 
         DB::beginTransaction();
 
@@ -253,11 +305,18 @@ class Member extends Model
             // 过期时间
             $overdue = Carbon::now()->addDays(365)->toDateString();
 
-            $sql->card_id = $data['card_id'];
+            $cardId = Card::getIdByNumber($data['card_number']);
+
+            // 存储头像
+            $path = 'identity/' . self::datePath() . $data['identity'] . '.png';
+            $avatar = substr($data['avatar'], strpos($data['avatar'], ',') + 1);
+            Storage::put($path, base64_decode($avatar));
+
+            $sql->card_id = $cardId;
             $sql->name = $data['name'];
             $sql->sex = $data['sex'];
             $sql->phone = $data['phone'];
-            $sql->avatar = $data['avatar'];
+            $sql->avatar = config('app.image_domain') . $path;
             $sql->identity = $data['identity'];
             $sql->status = self::STATUS_NORMAL;
             $sql->overdue = $overdue;
@@ -270,7 +329,7 @@ class Member extends Model
             CardRecord::add($sql->id, $overdue);
 
             // 卡片激活
-            Card::activate($data['card_id'], $sql->id);
+            Card::activate($cardId, $sql->id);
 
             // 日志
             Log::add($userId, '实体卡开卡-' . $data['name'] . '(' . $data['identity'] . ')');
@@ -287,10 +346,10 @@ class Member extends Model
      * 参数校验
      * @param $identity
      * @param $phone
-     * @param $cardId
+     * @param $cardNumber
      * @return bool|string
      */
-    static public function checkUnique($identity, $phone, $cardId)
+    static public function checkUnique($identity, $phone, $cardNumber)
     {
         $identityCount = self::where('identity', $identity)->count();
 
@@ -300,10 +359,12 @@ class Member extends Model
 
         if ($phoneCount > 0) return '手机号已存在';
 
-        $cardCount = Card::where('id', $cardId)->where('status', Card::STATUS_WAIT)->count();
+        $card = Card::where('number', $cardNumber)->first();
 
-        if ($cardCount != 1) return '卡片已激活';
+        if (!$card)  return '卡号无效';
 
-        return false;
+        if ($card->status != Card::STATUS_WAIT) return '卡片已绑定其他会员';
+
+        return true;
     }
 }

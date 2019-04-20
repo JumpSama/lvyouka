@@ -11,13 +11,14 @@ class CardUsedRecord extends Model
 {
     /**
      * 用户使用记录
-     * @param $cardId
+     * @param $cardNumber
      * @param $userId
      * @return array
      */
-    static public function getLog($cardId, $userId)
+    static public function getLog($cardNumber, $userId)
     {
         $user = User::find($userId);
+        $cardId = Card::getIdByNumber($cardNumber);
         $member = Member::where('card_id', $cardId)->first();
 
         if (!$member) return ['msg' => '会员不存在'];
@@ -26,28 +27,24 @@ class CardUsedRecord extends Model
         // 当前周期id
         $recordId = self::getRecordId($member->id);
 
-        $list = DB::table('site_items as a')
-            ->select(['a.item_name', 'a.item_count', 'b.count'])
-            ->leftJoin('card_used_records as b', 'a.id', '=', 'b.item_id')
-            ->where('a.site_id', $user->site)
-            ->where('b.member_id', $member->id)
-            ->where('b.record_id', $recordId)
-            ->get();
+        $items = SiteItem::select(['id', 'item_name', 'item_count'])->where('site_id', $user->site)->get();
+        $counts = self::select(['item_id', 'count'])
+            ->where('site_id', $user->site)->where('member_id', $member->id)->where('record_id', $recordId)->get();
 
-        return ['list' => $list];
+        return ['detail' => $member, 'items' => $items, 'counts' => $counts];
     }
 
     /**
      * 刷卡记录添加
-     * @param $cardId
+     * @param $memberId
      * @param $userId
      * @param $itemId
      * @return bool|string
      */
-    static public function add($cardId, $userId, $itemId)
+    static public function add($memberId, $userId, $itemId)
     {
         $user = User::find($userId);
-        $member = Member::where('card_id', $cardId)->first();
+        $member = Member::find($memberId);
 
         if (!$member) return '会员不存在';
         if ($member->status != Member::STATUS_NORMAL) return '卡片已过期';
@@ -58,9 +55,9 @@ class CardUsedRecord extends Model
         DB::beginTransaction();
 
         try {
-            $recordId = self::getRecordId($member->id);
+            $recordId = self::getRecordId($memberId);
 
-            $sql = self::where('member_id', $member->id)->where('record_id', $recordId)->where('item_id', $itemId)->first();
+            $sql = self::where('member_id', $memberId)->where('record_id', $recordId)->where('item_id', $itemId)->first();
 
             if ($sql) {
                 $item = SiteItem::find($itemId);
@@ -71,7 +68,7 @@ class CardUsedRecord extends Model
             } else {
                 $sql = new self;
 
-                $sql->member_id = $member->id;
+                $sql->member_id = $memberId;
                 $sql->record_id = $recordId;
                 $sql->site_id = $user->site;
                 $sql->item_id = $itemId;

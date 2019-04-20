@@ -67,4 +67,30 @@ class Card extends Model
 
         return $sql->save();
     }
+
+    /**
+     * 根据卡号获取id
+     * @param $number
+     * @return mixed
+     */
+    static public function getIdByNumber($number)
+    {
+        $sql = self::where('number', $number)->first();
+
+        return $sql->id;
+    }
+
+    /**
+     * 挂失卡片
+     * @param $id
+     * @return mixed
+     */
+    static public function lost($id)
+    {
+        $sql = self::find($id);
+
+        $sql->status = self::STATUS_LOST;
+
+        return $sql->save();
+    }
 }
