@@ -105,7 +105,7 @@ class CardUsedRecord extends Model
     static public function getRecordId($memberId)
     {
         $today = Carbon::today()->toDateString();
-        $record = CardRecord::where('member_id', $memberId)->where('overdue', '>=', $today)->first();
+        $record = CardRecord::where('member_id', $memberId)->where('overdue', '>=', $today)->orderBy('overdue', 'asc')->first();
         return $record->id;
     }
 }
