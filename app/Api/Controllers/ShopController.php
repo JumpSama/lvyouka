@@ -108,7 +108,7 @@ class ShopController extends BaseController
      */
     public function orderList(Request $request)
     {
-        $data = $request->only(['status', 'name', 'keyword']);
+        $data = $request->only(['order_id', 'status', 'name', 'keyword']);
 
         $offset = $request->input('offset', 0);
         $limit = $request->input('limit', 10);
