@@ -77,6 +77,8 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
         $api->post('member_list', 'MemberController@memberList');
         // 会员详情
         $api->post('member_detail', 'MemberController@memberDetail');
+        // 刷卡获取会员详情
+        $api->post('member_detail_by_card', 'MemberController@memberDetailByCard');
         // 审核列表
         $api->post('approve_list', 'MemberController@approveList');
         // 审核操作
@@ -114,6 +116,8 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
         $api->post('card_bind_member', 'MemberController@cardBindMember');
         // 挂失绑定新卡
         $api->post('card_change_member', 'MemberController@cardChangeMember');
+        // 续费
+        $api->post('card_renew_member', 'MemberController@cardRenewMember');
         // 卡片使用记录
         $api->post('card_use_log', 'MemberController@cardUseLog');
         // 刷卡

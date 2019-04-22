@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
@@ -61,13 +62,16 @@ class Site extends Model
             // 先删除
             if (isset($data['id'])) SiteItem::where('site_id', $data['id'])->delete();
 
+            $now = Carbon::now();
             $items = json_decode($data['items'], true);
             $insertData = [];
             foreach ($items as $item) {
                 $insertData[] = [
                     'site_id' => $sql->id,
                     'item_name' => $item['item_name'],
-                    'item_count' => $item['item_count']
+                    'item_count' => $item['item_count'],
+                    'created_at' => $now,
+                    'updated_at' => $now
                 ];
             }
             DB::table('site_items')->insert($insertData);

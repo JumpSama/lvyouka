@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
@@ -72,12 +73,15 @@ class Role extends Model
             // 先删除
             if (isset($data['id'])) RoleDetail::where('role_id', $data['id'])->delete();
 
+            $now = Carbon::now();
             $ids = $data['ids'];
             $insertData = [];
             foreach ($ids as $id) {
                 $insertData[] = [
                     'menu_id' => $id,
-                    'role_id' => $sql->id
+                    'role_id' => $sql->id,
+                    'created_at' => $now,
+                    'updated_at' => $now
                 ];
             }
             DB::table('role_details')->insert($insertData);

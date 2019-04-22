@@ -194,11 +194,45 @@ class MemberController extends BaseController
      */
     public function sendSms(Request $request)
     {
-        if (!$request->filled('phone')) return $this->responseError('参数错误');
+        if (!$request->filled('phone')) return $this->responseError([], '参数错误');
 
         $sms = SmsRecord::sendCode($request->input('phone'));
 
         if ($sms !== true) return $this->responseError();
+
+        return $this->responseData();
+    }
+
+    /**
+     * 刷卡获取会员详情
+     * @param Request $request
+     * @return mixed
+     */
+    public function memberDetailByCard(Request $request)
+    {
+        if (!$request->filled('card_number')) return $this->responseError([],'参数错误');
+
+        $detail = Member::memberDetailByCard($request->input('card_number'));
+
+        if (isset($detail['msg'])) return $this->responseError([], $detail['msg']);
+
+        return $this->responseData($detail);
+    }
+
+    /**
+     * 续费
+     * @param Request $request
+     * @return mixed
+     */
+    public function cardRenewMember(Request $request)
+    {
+        if (!$request->filled('card_number')) return $this->responseError([],'参数错误');
+
+        $user = JWTAuth::user();
+
+        $result = Member::renew($request->input('card_number'), $user['id']);
+
+        if ($result !== true) return $this->responseError([], $result);
 
         return $this->responseData();
     }

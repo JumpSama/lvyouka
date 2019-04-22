@@ -37,8 +37,12 @@ Route::prefix('wechat')->group(function () {
     Route::post('apply', 'WechatController@apply');
     // 未支付重新支付
     Route::post('repay', 'WechatController@repay');
+    // 在线续费
+    Route::post('renew', 'WechatController@renew');
     // 支付回调
     Route::any('card_callback', 'PayController@cardCallback');
+    // 续费回调
+    Route::any('renew_callback', 'PayController@renewCallback');
     // 签到
     Route::post('sign_in', 'WechatController@signIn');
     // 积分列表

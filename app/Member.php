@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Http\Controllers\PayController;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -366,5 +367,122 @@ class Member extends Model
         if ($card->status != Card::STATUS_WAIT) return '卡片已绑定其他会员';
 
         return true;
+    }
+
+    /**
+     * 刷卡获取会员详情
+     * @param $cardNumber
+     * @return array
+     */
+    static public function memberDetailByCard($cardNumber)
+    {
+        $card = Card::where('number', $cardNumber)->first();
+
+        if (!$card) return ['msg' => '卡片不存在'];
+        if ($card->status !== Card::STATUS_NORMAL)  return ['msg' => '卡片未激活'];
+
+        $detail = self::where('card_id', $card->id)->first()->toArray();
+
+        if (!$detail) return ['msg' => '会员不存在'];
+
+        $detail['renew'] = self::isRenew($detail['overdue']);
+
+        return $detail;
+    }
+
+    /**
+     * 是否能续费
+     * @param $overdue
+     * @return bool
+     */
+    static public function isRenew($overdue)
+    {
+        $today = Carbon::today()->toDateString();
+
+        if ($today > $overdue) return true;
+
+        $minDay = Config::get('Card.Renew', 30);
+
+        if (Carbon::today()->addDays($minDay)->toDateString() >= $overdue) return true;
+
+        return false;
+    }
+
+    /**
+     * 实体卡续费
+     * @param $cardNumber
+     * @param $userId
+     * @return bool|string
+     */
+    static public function renew($cardNumber, $userId)
+    {
+        DB::beginTransaction();
+
+        try {
+            $card = Card::where('number', $cardNumber)->first();
+
+            if (!$card) throw new \Exception('卡片不存在');
+            if ($card->status !== Card::STATUS_NORMAL) throw new \Exception('卡片未激活');
+
+            $detail = self::where('card_id', $card->id)->first();
+
+            if (!$detail) throw new \Exception('会员不存在');
+            if (!self::isRenew($detail->overdue)) throw new \Exception('暂无法续费');
+
+            if ($detail->overdue > Carbon::today()->toDateString()) {
+                $overdue = (new Carbon($detail->overdue))->addDays(365)->toDateString();
+            } else {
+                $overdue = Carbon::today()->addDays(365)->toDateString();
+            }
+
+            $detail->overdue = $overdue;
+            $detail->status = self::STATUS_NORMAL;
+            $detail->save();
+
+            // 开卡记录
+            CardRecord::add($detail->id, $overdue);
+
+            // 日志
+            Log::add($userId, '实体卡续费-' . $detail->name . '(' . $detail->identity . ')');
+
+            DB::commit();
+            return true;
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return $exception->getMessage();
+        }
+    }
+
+    /**
+     * 在线续费
+     * @param $id
+     * @return array|bool|string
+     */
+    static public function renewByPay($id)
+    {
+        DB::beginTransaction();
+
+        try {
+            $member = self::find($id);
+
+            if (!$member) throw new \Exception('会员不存在');
+            if (!self::isRenew($member->overdue)) throw new \Exception('暂无法续费');
+
+            $out_trade_no = str_random(20) . '-' . time();
+
+            // 支付订单
+            CardOrder::add($member->identity, $out_trade_no);
+
+            $pay = new PayController();
+            $payParams = $pay->cardPay($out_trade_no, $member->openid, 'renew');
+
+            if ($payParams === false) throw new \Exception('调用支付失败');
+
+            DB::commit();
+            return ['params' => $payParams];
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return $exception->getMessage();
+        }
     }
 }

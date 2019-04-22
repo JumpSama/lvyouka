@@ -9,7 +9,10 @@ namespace App\Http\Controllers;
 
 
 use App\CardOrder;
+use App\CardRecord;
+use App\Member;
 use App\TempMember;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -44,12 +47,13 @@ class PayController extends BaseController
     }
 
     /**
-     * 卡片开卡
+     * 卡片开卡、续费
      * @param $out_trade_no
      * @param $openid
+     * @param string $type
      * @return array|bool
      */
-    public function cardPay($out_trade_no, $openid)
+    public function cardPay($out_trade_no, $openid, $type = 'new')
     {
         $order = CardOrder::where('out_trade_no', $out_trade_no)->first();
 
@@ -58,7 +62,7 @@ class PayController extends BaseController
                 'body' => $this->name,
                 'out_trade_no' => $out_trade_no,
                 'total_fee' => $this->getFee($order->amount),
-                'notify_url' => $this->url . 'card_callback',
+                'notify_url' => $this->url . ($type == 'new' ? 'card_callback' : 'renew_callback'),
                 'trade_type' => 'JSAPI',
                 'openid' => $openid
             ]);
@@ -120,6 +124,57 @@ class PayController extends BaseController
 
                         $member->status = TempMember::STATUS_WAIT;
                         $member->save();
+                    }
+
+                    DB::commit();
+                    return true;
+                } catch (\Exception $exception) {
+                    Log::debug($exception->getMessage());
+                    DB::rollBack();
+                    return $fail('订单状态修改失败');
+                }
+            } else {
+                return $fail('通信失败');
+            }
+        });
+
+        return $response;
+    }
+
+    /**
+     * 卡片续费回调
+     * @return mixed
+     */
+    public function renewCallback()
+    {
+        $response = $this->pay->handlePaidNotify(function ($message, $fail) {
+            if ($message['return_code'] === 'SUCCESS') {
+                DB::beginTransaction();
+
+                try {
+                    $order = CardOrder::where('out_trade_no', $message['out_trade_no'])->first();
+
+                    // 更改订单状态
+                    if ($order && $message['result_code'] == 'SUCCESS' && $order->status == CardOrder::STATUS_PAY_NO) {
+                        $order->status = CardOrder::STATUS_PAY_YES;
+
+                        if (isset($message['transaction_id'])) $order->transaction_id = $message['transaction_id'];
+
+                        $order->save();
+
+                        // 更改会员到期时间
+                        $member = Member::where('identity', $order->identity)->first();
+                        if ($member->overdue > Carbon::today()->toDateString()) {
+                            $overdue = (new Carbon($member->overdue))->addDays(365)->toDateString();
+                        } else {
+                            $overdue = Carbon::today()->addDays(365)->toDateString();
+                        }
+                        $member->overdue = $overdue;
+                        $member->status = Member::STATUS_NORMAL;
+                        $member->save();
+
+                        // 开卡记录
+                        CardRecord::add($member->id, $overdue);
                     }
 
                     DB::commit();

@@ -31,10 +31,10 @@ class ConfigsTableSeeder extends Seeder
                 'updated_at' => Carbon::now()
             ],
             [
-                'name' => '签到规则说明',
-                'datatype' => 'richtext',
-                'key' => 'Sign.Explain',
-                'value' => '',
+                'name' => '过期前多少天可续费',
+                'datatype' => 'string',
+                'key' => 'Card.Renew',
+                'value' => '30',
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
             ]

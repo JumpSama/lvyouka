@@ -7,6 +7,7 @@
     <title>{{ config('app.name') }}</title>
     <link href="{{asset('css/common.css')}}" rel="stylesheet" type="text/css" media="screen,projection" />
     <script type="text/javascript" src="{{asset('js/jquery-1.11.1.min.js')}}"></script>
+    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
 </head>
 
 <body>
@@ -17,6 +18,9 @@
             <div class="time">过期时间：{{ $member['overdue'] }}</div>
         @else
             <div class="time">已过期</div>
+        @endif
+        @if ($member['renew'])
+            <input class="btn1" type="button" value="续费" id="renew">
         @endif
     </div>
 
@@ -55,6 +59,9 @@
 </div>
 
 <script type="text/javascript">
+    var jsConfig = JSON.parse(@json($jsConfig));
+    wx.config(jsConfig);
+
     $(document).ready(function(){
         $(".wx_btn").click(function(){
             $('#cover2').show();
@@ -76,8 +83,47 @@
             });
         });
 
+        // 隐藏二维码
         $(".cover,.wm_open").click(function(){
             $(".cover,.wm_open").hide();
+        });
+
+        // 续费
+        $('#renew').on('click',function () {
+            $('#cover2').show();
+
+            $.ajax({
+                type: 'post',
+                url: 'renew',
+                dataType: 'json',
+                success: function (res) {
+                    $('#cover2').hide();
+
+                    if (res.code === 200) {
+                        var data = res.data;
+
+                        // 支付
+                        var params = data.params;
+                        wx.chooseWXPay({
+                            timestamp: params.timestamp,
+                            nonceStr: params.nonceStr,
+                            package: params.package,
+                            signType: params.signType,
+                            paySign: params.paySign,
+                            success: function (res) {
+                                alert('续费成功！');
+
+                                location.reload();
+                            },
+                            cancel: function () {
+                                alert('已取消支付！');
+                            }
+                        });
+                    } else {
+                        alert(res.msg);
+                    }
+                }
+            });
         });
     });
 </script>

@@ -17,6 +17,7 @@ use App\SmsRecord;
 use App\TempMember;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class WechatController extends BaseController
 {
@@ -111,7 +112,21 @@ class WechatController extends BaseController
 
         if ($result['flag'] == false) return $this->responseError($result['msg']);
 
-        return $this->responseData($result['params'] ? ['params' => $result['params']] : []);
+        return $this->responseData(isset($result['params']) ? ['params' => $result['params']] : []);
+    }
+
+    /**
+     * 在线续费
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function renew()
+    {
+        $member = $this->getMember();
+        $result = Member::renewByPay($member->id);
+
+        if (is_string($result)) return $this->responseError($result);
+        
+        return $this->responseData(isset($result['params']) ? ['params' => $result['params']] : []);
     }
 
     /**
@@ -293,10 +308,13 @@ class WechatController extends BaseController
     public function me()
     {
         $member = $this->getMember();
+        $member['renew'] = Member::isRenew($member->overdue);
 
         $signDay = $this->getSignDay($member->sign_date, $member->sign_day);
 
-        return view('me', compact('member', 'signDay'));
+        $jsConfig = $this->wechat->jssdk->buildConfig(['chooseWXPay']);
+
+        return view('me', compact('member', 'signDay', 'jsConfig'));
     }
 
     /**
