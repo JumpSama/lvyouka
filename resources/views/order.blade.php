@@ -97,7 +97,7 @@
                             '<div class="r">' +
                             '<p>' + this.name + '</p>' +
                             '<div class="num">订单号：' + this.order_id + '</div>' +
-                            '<div class="time">' + this.created_at + '</div>' +
+                            '<div class="time">下单时间：' + this.created_at + '</div>' +
                             '<div class="bt">' +
                             '<div class="integral"><em>' + parseInt(this.amount) + '</em>积分</div>' +
                             '<span>' + (this.status === 1 ? '已兑换' : '已完成') + '</span>' +

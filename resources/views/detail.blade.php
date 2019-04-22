@@ -60,6 +60,7 @@
 
     // 兑换
     $('#buy').on('click', function () {
+        if (!confirm('确认兑换吗？')) return false;
         $.ajax({
             type: 'post',
             url: 'commodity_buy',
