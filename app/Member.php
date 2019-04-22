@@ -34,7 +34,7 @@ class Member extends Model
     static public function memberList($data, $offset = 0, $limit = 10)
     {
         $sql = DB::table('members as a')
-            ->select(['a.id', 'a.card_id', 'a.name', 'a.sex', 'a.phone', 'a.identity', 'a.status', 'a.overdue', 'a.point', 'b.number'])
+            ->select(['a.id', 'a.card_id', 'a.name', 'a.sex', 'a.phone', 'a.identity', 'a.status', 'a.overdue', 'a.point', 'b.number', 'b.status as card_status'])
             ->leftJoin('cards as b', 'a.card_id', '=', 'b.id');
 
         if (isset($data['status'])) $sql = $sql->where('a.status', $data['status']);
@@ -379,7 +379,7 @@ class Member extends Model
         $card = Card::where('number', $cardNumber)->first();
 
         if (!$card) return ['msg' => '卡片不存在'];
-        if ($card->status !== Card::STATUS_NORMAL)  return ['msg' => '卡片未激活'];
+        if ($card->status !== Card::STATUS_NORMAL)  return ['msg' => '卡片未激活或已冻结'];
 
         $detail = self::where('card_id', $card->id)->first()->toArray();
 
@@ -484,5 +484,47 @@ class Member extends Model
             DB::rollBack();
             return $exception->getMessage();
         }
+    }
+
+    /**
+     * 冻结实体卡
+     * @param $id
+     * @return bool|string
+     */
+    static public function disableCard($id)
+    {
+        $member = self::find($id);
+
+        if (empty($member->card_id)) return '用户未绑定实体卡';
+
+        $card = Card::find($member->card_id);
+
+        if ($card->status == Card::STATUS_NORMAL) {
+            $card->status = Card::STATUS_DISABLE;
+            if ($card->save()) return true;
+        }
+
+        return '冻结失败';
+    }
+
+    /**
+     * 解冻实体卡
+     * @param $id
+     * @return bool|string
+     */
+    static public function enableCard($id)
+    {
+        $member = self::find($id);
+
+        if (empty($member->card_id)) return '用户未绑定实体卡';
+
+        $card = Card::find($member->card_id);
+
+        if ($card->status == Card::STATUS_DISABLE) {
+            $card->status = Card::STATUS_NORMAL;
+            if ($card->save()) return true;
+        }
+
+        return '解冻失败';
     }
 }

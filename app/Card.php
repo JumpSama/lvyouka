@@ -10,6 +10,7 @@ class Card extends Model
     const STATUS_WAIT = 0;  //未激活
     const STATUS_NORMAL = 1;    //已激活
     const STATUS_LOST = 2;  //已挂失
+    const STATUS_DISABLE = 3;   //已冻结
 
     /**
      * 卡片列表

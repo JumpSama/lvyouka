@@ -15,6 +15,7 @@ class CreateOrdersTable extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('order_id', 20)->comment('订单id');
             $table->integer('member_id')->default(0)->comment('用户id');
             $table->integer('commodity_id')->default(0)->comment('商品id');
             $table->decimal('amount', 18, 2)->default(0.00)->comment('积分数额');

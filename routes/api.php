@@ -79,6 +79,10 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
         $api->post('member_detail', 'MemberController@memberDetail');
         // 刷卡获取会员详情
         $api->post('member_detail_by_card', 'MemberController@memberDetailByCard');
+        // 冻结实体卡
+        $api->post('member_disable', 'MemberController@memberDisable');
+        // 解冻实体卡
+        $api->post('member_enable', 'MemberController@memberEnable');
         // 审核列表
         $api->post('approve_list', 'MemberController@approveList');
         // 审核操作

@@ -96,6 +96,7 @@
                             '<img src="' + this.image + '" alt=""/>' +
                             '<div class="r">' +
                             '<p>' + this.name + '</p>' +
+                            '<div class="num">订单号：' + this.order_id + '</div>' +
                             '<div class="time">' + this.created_at + '</div>' +
                             '<div class="bt">' +
                             '<div class="integral"><em>' + parseInt(this.amount) + '</em>积分</div>' +

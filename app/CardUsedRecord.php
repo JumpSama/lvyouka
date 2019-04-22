@@ -22,8 +22,13 @@ class CardUsedRecord extends Model
 
         // 刷卡根据卡号获取
         if (isset($data['card_number'])) {
-            $cardId = Card::getIdByNumber($data['card_number']);
-            $member = Member::where('card_id', $cardId)->first();
+            $card = Card::where('card_number', $data['card_number'])->first();
+
+            if ($card->status == Card::STATUS_WAIT) return ['msg' => '卡片未激活'];
+            if ($card->status == Card::STATUS_LOST) return ['msg' => '卡片已挂失'];
+            if ($card->status == Card::STATUS_DISABLE) return ['msg' => '卡片已冻结'];
+
+            $member = Member::where('card_id', $card->id)->first();
         } else {
             // 扫描二维码根据缓存获取
             $memberId = Redis::get($data['qrcode']);

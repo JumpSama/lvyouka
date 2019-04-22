@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
@@ -21,11 +22,12 @@ class Order extends Model
     static public function orderList($data, $offset = 0, $limit = 10)
     {
         $sql = DB::table('orders as a')
-            ->select(['a.id', 'a.member_id', 'a.commodity_id', 'a.amount', 'a.status', 'a.created_at', 'b.name as commodity_name', 'c.name as member_name', 'c.phone'])
+            ->select(['a.id', 'a.order_id', 'a.member_id', 'a.commodity_id', 'a.amount', 'a.status', 'a.created_at', 'b.name as commodity_name', 'c.name as member_name', 'c.phone'])
             ->leftJoin('commodities as b', 'a.commodity_id', '=', 'b.id')
             ->leftJoin('members as c', 'a.member_id', '=', 'c.id');
 
         if (isset($data['status'])) $sql = $sql->where('a.status', $data['status']);
+        if (isset($data['order_id'])) $sql = $sql->where('a.order_id', 'like', '%'. $data['order_id'] . '%');
         if (isset($data['name'])) $sql = $sql->where('b.name', 'like', '%' . $data['name'] . '%');
         if (isset($data['keyword'])) {
             $keyword = $data['keyword'];
@@ -75,6 +77,7 @@ class Order extends Model
     {
         $sql = new self;
 
+        $sql->order_id = str_random(5) . time();
         $sql->member_id = $memberId;
         $sql->commodity_id = $commodityId;
         $sql->amount = $amount;
@@ -94,7 +97,7 @@ class Order extends Model
     static public function getList($data, $memberId, $offset = 0, $limit = 10)
     {
         $sql = DB::table('orders as a')
-            ->select(['a.id', 'a.amount', 'a.status', 'a.created_at', 'b.name', 'b.image'])
+            ->select(['a.id', 'a.order_id', 'a.amount', 'a.status', 'a.created_at', 'b.name', 'b.image'])
             ->leftJoin('commodities as b', 'a.commodity_id', '=', 'b.id')
             ->where('a.member_id', $memberId);
 

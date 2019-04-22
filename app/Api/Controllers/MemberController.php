@@ -236,4 +236,32 @@ class MemberController extends BaseController
 
         return $this->responseData();
     }
+
+    /**
+     * 实体卡冻结
+     * @param Request $request
+     * @return mixed
+     */
+    public function memberDisable(Request $request)
+    {
+        if (!$request->filled('id')) return $this->responseError([],'参数错误');
+
+        if (Member::disableCard($request->input('id'))) return $this->responseData();
+
+        return $this->responseError();
+    }
+
+    /**
+     * 解冻实体卡
+     * @param Request $request
+     * @return mixed
+     */
+    public function memberEnable(Request $request)
+    {
+        if (!$request->filled('id')) return $this->responseError([],'参数错误');
+
+        if (Member::enableCard($request->input('id'))) return $this->responseData();
+
+        return $this->responseError();
+    }
 }
