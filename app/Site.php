@@ -59,22 +59,38 @@ class Site extends Model
             $sql->name = $data['name'];
             $sql->save();
 
-            // 先删除
-            if (isset($data['id'])) SiteItem::where('site_id', $data['id'])->delete();
-
+            // 项目更新
             $now = Carbon::now();
             $items = json_decode($data['items'], true);
+            $ids = [];
             $insertData = [];
             foreach ($items as $item) {
-                $insertData[] = [
-                    'site_id' => $sql->id,
-                    'item_name' => $item['item_name'],
-                    'item_count' => $item['item_count'],
-                    'created_at' => $now,
-                    'updated_at' => $now
-                ];
+                if (isset($item['id'])) {
+                    SiteItem::updateById($item['id'], [
+                        'item_name' => $item['item_name'],
+                        'item_count' => $item['item_count']
+                    ]);
+                    $ids[] = $item['id'];
+                } else {
+                    $insertData[] = [
+                        'site_id' => $sql->id,
+                        'item_name' => $item['item_name'],
+                        'item_count' => $item['item_count'],
+                        'created_at' => $now,
+                        'updated_at' => $now
+                    ];
+                }
             }
-            DB::table('site_items')->insert($insertData);
+
+            // 先删除
+            if (isset($data['id'])) {
+                $itemDel = SiteItem::where('site_id', $data['id']);
+                if (!empty($ids)) $itemDel = $itemDel->whereNotIn('id', $ids);
+                $itemDel->delete();
+            }
+
+            // 再加新的
+            if (!empty($insertData)) DB::table('site_items')->insert($insertData);
 
             // 日志
             if (isset($data['id'])) Log::add($userId, '修改场所-' . $data['name']);
