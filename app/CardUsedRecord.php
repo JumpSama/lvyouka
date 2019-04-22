@@ -6,20 +6,30 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 
 class CardUsedRecord extends Model
 {
     /**
      * 用户使用记录
-     * @param $cardNumber
+     * @param $data
      * @param $userId
      * @return array
      */
-    static public function getLog($cardNumber, $userId)
+    static public function getLog($data, $userId)
     {
         $user = User::find($userId);
-        $cardId = Card::getIdByNumber($cardNumber);
-        $member = Member::where('card_id', $cardId)->first();
+
+        // 刷卡根据卡号获取
+        if (isset($data['card_number'])) {
+            $cardId = Card::getIdByNumber($data['card_number']);
+            $member = Member::where('card_id', $cardId)->first();
+        } else {
+            // 扫描二维码根据缓存获取
+            $memberId = Redis::get($data['qrcode']);
+            if (!$memberId)  return ['msg' => '二维码已过期'];
+            $member = Member::find($memberId);
+        }
 
         if (!$member) return ['msg' => '会员不存在'];
         if ($member->status != Member::STATUS_NORMAL) return ['msg' => '卡片已过期'];

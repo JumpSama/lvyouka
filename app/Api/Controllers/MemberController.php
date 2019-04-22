@@ -156,11 +156,13 @@ class MemberController extends BaseController
      */
     public function cardUseLog(Request $request)
     {
-        if (!$request->filled(['card_number'])) return $this->responseError([], '参数错误');
+        if (!$request->filled('card_number') && !$request->filled('qrcode')) return $this->responseError([], '参数错误');
 
         $user = JWTAuth::user();
 
-        $list = CardUsedRecord::getLog($request->input('card_number'), $user['id']);
+        $data = $request->only(['card_number', 'qrcode']);
+
+        $list = CardUsedRecord::getLog($data, $user['id']);
 
         if (isset($list['msg'])) return $this->responseError([], $list['msg']);
 
