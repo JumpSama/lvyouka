@@ -265,7 +265,7 @@ class Member extends Model
             Storage::put($path, base64_decode($avatar));
 
             $member->card_id = $card->id;
-            $member->avatar = config('app.image_domain') . $avatar;
+            $member->avatar = config('app.image_domain') . $path;
             $member->save();
 
             // 卡片激活
