@@ -22,7 +22,7 @@ class CardUsedRecord extends Model
 
         // 刷卡根据卡号获取
         if (isset($data['card_number'])) {
-            $card = Card::where('card_number', $data['card_number'])->first();
+            $card = Card::where('number', $data['card_number'])->first();
 
             if ($card->status == Card::STATUS_WAIT) return ['msg' => '卡片未激活'];
             if ($card->status == Card::STATUS_LOST) return ['msg' => '卡片已挂失'];
