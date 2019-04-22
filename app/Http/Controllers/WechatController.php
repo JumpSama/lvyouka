@@ -102,10 +102,6 @@ class WechatController extends BaseController
 
         if (!$request->filled($fields)) return $this->responseError('参数错误');
 
-        $sms = SmsRecord::checkCode($request->input('phone'), $request->input('code'));
-
-        if ($sms !== true)  return $this->responseError($sms);
-
         $data = $request->only($fields);
 
         $result = TempMember::add($data, $this->getOpenid());
@@ -125,7 +121,7 @@ class WechatController extends BaseController
         $result = Member::renewByPay($member->id);
 
         if (is_string($result)) return $this->responseError($result);
-        
+
         return $this->responseData(isset($result['params']) ? ['params' => $result['params']] : []);
     }
 

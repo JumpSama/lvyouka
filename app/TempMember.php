@@ -129,6 +129,15 @@ class TempMember extends Model
             ];
         }
 
+        $sms = SmsRecord::checkCode($data['phone'], $data['code']);
+
+        if ($sms !== true) {
+            return [
+                'flag' => false,
+                'msg' => $sms
+            ];
+        }
+
         DB::beginTransaction();
 
         try {
