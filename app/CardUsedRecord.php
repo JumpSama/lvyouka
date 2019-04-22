@@ -24,6 +24,7 @@ class CardUsedRecord extends Model
         if (isset($data['card_number'])) {
             $card = Card::where('number', $data['card_number'])->first();
 
+            if (!$card) return ['msg' => '卡片不存在'];
             if ($card->status == Card::STATUS_WAIT) return ['msg' => '卡片未激活'];
             if ($card->status == Card::STATUS_LOST) return ['msg' => '卡片已挂失'];
             if ($card->status == Card::STATUS_DISABLE) return ['msg' => '卡片已冻结'];
