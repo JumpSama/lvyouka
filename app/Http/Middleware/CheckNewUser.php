@@ -19,13 +19,13 @@ class CheckNewUser
         $member = session('wechat.oauth_user.default');
         $openid = $member['original']['openid'];
 
-        $wechat = app('wechat.official_account');
+        /*$wechat = app('wechat.official_account');
 
         $user = $wechat->user->get($openid);
 
         if ($user['subscribe'] == 0) {
             return redirect(config('app.guide_url'));
-        }
+        }*/
 
         $info = Member::where('openid', $openid)->first();
 
