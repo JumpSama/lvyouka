@@ -208,6 +208,11 @@
 
     // 提交
     $('#submit').on('click', function () {
+        var clickTime = $(this).attr('ctime');
+        var nowTime = new Date().getTime();
+        if (clickTime && nowTime - clickTime < 2000) return false;
+        $(this).attr('ctime', nowTime);
+
         var flag = false;
         var formData = $('#memberForm').serializeArray();
         var data = {};
