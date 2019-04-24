@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class CardOrder extends Model
 {
-    const STATUS_PAY_NO = 0;
-    const STATUS_PAY_YES = 1;
+    const STATUS_PAY_NO = 0;    //待支付
+    const STATUS_PAY_YES = 1;   //已支付
 
     /**
      * 卡片年费订单

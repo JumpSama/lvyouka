@@ -15,7 +15,7 @@ class ConfigsTableSeeder extends Seeder
     {
         DB::table('configs')->insert([
             [
-                'name' => '文旅惠民卡年费',
+                'name' => '文旅惠民卡年费（元）',
                 'datatype' => 'string',
                 'key' => 'Card.Price',
                 'value' => '100',
