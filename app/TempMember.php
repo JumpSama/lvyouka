@@ -83,7 +83,7 @@ class TempMember extends Model
                 $member->save();
 
                 // 开卡记录
-                if ($logFlag) CardRecord::add($member->id, $overdue);
+                if ($logFlag) CardRecord::add($member->id, $overdue, CardRecord::TYPE_NEW, CardRecord::TYPE_NEW);
 
                 // 日志
                 Log::add($userId, '审核通过用户-' . $detail->name . '(' . $detail->identity . ')');

@@ -174,7 +174,7 @@ class PayController extends BaseController
                         $member->save();
 
                         // 开卡记录
-                        CardRecord::add($member->id, $overdue);
+                        CardRecord::add($member->id, $overdue, CardRecord::TYPE_RENEW, CardRecord::PAY_ONLINE);
                     }
 
                     DB::commit();

@@ -327,7 +327,7 @@ class Member extends Model
             $sql->save();
 
             // 开卡记录
-            CardRecord::add($sql->id, $overdue);
+            CardRecord::add($sql->id, $overdue, CardRecord::TYPE_NEW, CardRecord::PAY_OFFLINE, $userId);
 
             // 卡片激活
             Card::activate($cardId, $sql->id);
@@ -439,8 +439,8 @@ class Member extends Model
             $detail->status = self::STATUS_NORMAL;
             $detail->save();
 
-            // 开卡记录
-            CardRecord::add($detail->id, $overdue);
+            // 续费记录
+            CardRecord::add($detail->id, $overdue, CardRecord::TYPE_RENEW, CardRecord::PAY_OFFLINE, $userId);
 
             // 日志
             Log::add($userId, '实体卡续费-' . $detail->name . '(' . $detail->identity . ')');

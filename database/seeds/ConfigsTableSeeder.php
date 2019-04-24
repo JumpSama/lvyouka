@@ -31,6 +31,14 @@ class ConfigsTableSeeder extends Seeder
                 'updated_at' => Carbon::now()
             ],
             [
+                'name' => '同项目刷卡间隔（分钟）',
+                'datatype' => 'string',
+                'key' => 'Card.Interval',
+                'value' => '60',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ],
+            [
                 'name' => '过期前多少天可续费',
                 'datatype' => 'string',
                 'key' => 'Card.Renew',

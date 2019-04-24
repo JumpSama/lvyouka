@@ -103,7 +103,7 @@ class CardUsedRecord extends Model
             PointFlow::add($member->id, PointFlow::TYPE_USE, $point, $itemId);
 
             // 缓存
-            Cache::put($key, time(), config('app.card_use_interval', 120));
+            Cache::put($key, time(), Config::get('Card.Interval', 60));
 
             DB::commit();
             return true;

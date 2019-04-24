@@ -275,9 +275,4 @@ return [
      * 阿里云验证码模板CODE
      */
     'sms_template' => env('SMS_TEMPLATE_CODE'),
-
-    /**
-     * 刷卡间隔
-     */
-    'card_use_interval' => env('CARD_USE_INTERVAL'),
 ];

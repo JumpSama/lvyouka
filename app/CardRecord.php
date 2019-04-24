@@ -6,18 +6,27 @@ use Illuminate\Database\Eloquent\Model;
 
 class CardRecord extends Model
 {
+    const TYPE_NEW = 1; // 开卡
+    const TYPE_RENEW = 2;  // 续费
+
+    const PAY_OFFLINE = 1;  // 线下付款
+    const PAY_ONLINE = 2;    // 线上付款
+
     /**
-     * 开卡记录添加
+     * 开卡、续费记录添加
      * @param $memberId
      * @param $overdue
      * @return bool
      */
-    static public function add($memberId, $overdue)
+    static public function add($memberId, $overdue, $type, $payType, $userId = 0)
     {
         $sql = new self;
 
         $sql->member_id = $memberId;
         $sql->overdue = $overdue;
+        $sql->type = $type;
+        $sql->payType = $payType;
+        $sql->userId = $userId;
 
         return $sql->save();
     }
