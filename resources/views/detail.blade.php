@@ -46,6 +46,10 @@
         @endif
     </div>
 </div>
+<!-- 遮罩 -->
+<div id="cover" class="cover2">
+    <div class="loading"></div>
+</div>
 
 <script src="{{asset('js/swiper.min.js')}}"></script>
 <link rel="stylesheet" href="{{asset('js/swiper.min.css')}}">
@@ -60,7 +64,15 @@
 
     // 兑换
     $('#buy').on('click', function () {
+        var clickTime = $(this).attr('ctime');
+        var nowTime = new Date().getTime();
+        if (clickTime && nowTime - clickTime < 2000) return false;
+        $(this).attr('ctime', nowTime);
+
         if (!confirm('确认兑换吗？')) return false;
+
+        $('#cover').show();
+
         $.ajax({
             type: 'post',
             url: 'commodity_buy',
@@ -69,6 +81,8 @@
             },
             dataType: 'json',
             success: function (res) {
+                $('#cover').hide();
+
                 if (res.code === 200) {
                     alert('兑换成功');
                     location.reload();

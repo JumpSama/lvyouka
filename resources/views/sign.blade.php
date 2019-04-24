@@ -95,11 +95,15 @@
 
         // 签到
         $('#sign').on('click', function () {
+            $('#cover').show();
+
             $.ajax({
                 type: 'post',
                 url: 'sign_in',
                 dataType: 'json',
                 success: function (res) {
+                    $('#cover').hide();
+
                     if (res.code === 200) {
                         alert('签到成功');
                         location.reload();
