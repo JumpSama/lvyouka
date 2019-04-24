@@ -16,6 +16,9 @@ class CardRecord extends Model
      * 开卡、续费记录添加
      * @param $memberId
      * @param $overdue
+     * @param $type
+     * @param $payType
+     * @param int $userId
      * @return bool
      */
     static public function add($memberId, $overdue, $type, $payType, $userId = 0)
@@ -25,8 +28,8 @@ class CardRecord extends Model
         $sql->member_id = $memberId;
         $sql->overdue = $overdue;
         $sql->type = $type;
-        $sql->payType = $payType;
-        $sql->userId = $userId;
+        $sql->pay_type = $payType;
+        $sql->user_id = $userId;
 
         return $sql->save();
     }

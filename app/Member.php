@@ -338,6 +338,7 @@ class Member extends Model
             DB::commit();
             return true;
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::debug($e->getMessage());
             DB::rollBack();
             return '保存失败';
         }
