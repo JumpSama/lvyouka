@@ -246,7 +246,9 @@ class MemberController extends BaseController
     {
         if (!$request->filled('id')) return $this->responseError([],'参数错误');
 
-        if (Member::disableCard($request->input('id'))) return $this->responseData();
+        $user = JWTAuth::user();
+
+        if (Member::disableCard($request->input('id'), $user['id'])) return $this->responseData();
 
         return $this->responseError();
     }
@@ -260,7 +262,9 @@ class MemberController extends BaseController
     {
         if (!$request->filled('id')) return $this->responseError([],'参数错误');
 
-        if (Member::enableCard($request->input('id'))) return $this->responseData();
+        $user = JWTAuth::user();
+
+        if (Member::enableCard($request->input('id'), $user['id'])) return $this->responseData();
 
         return $this->responseError();
     }

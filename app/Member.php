@@ -248,7 +248,7 @@ class Member extends Model
 
         if (!$card) return '卡片不存在';
 
-        if ($card->status != Card::STATUS_WAIT) return '卡片已绑定其他会员';
+        if ($card->status != Card::STATUS_WAIT) return '卡片已绑其他会员或已挂失';
 
         $member = self::where('identity', $data['identity'])->first();
 
@@ -490,9 +490,10 @@ class Member extends Model
     /**
      * 冻结实体卡
      * @param $id
+     * @param $userId
      * @return bool|string
      */
-    static public function disableCard($id)
+    static public function disableCard($id, $userId)
     {
         $member = self::find($id);
 
@@ -502,7 +503,10 @@ class Member extends Model
 
         if ($card->status == Card::STATUS_NORMAL) {
             $card->status = Card::STATUS_DISABLE;
-            if ($card->save()) return true;
+            if ($card->save()) {
+                Log::add($userId, '冻结实体卡-' . $member->name . '(' . $member->identity . ')');
+                return true;
+            }
         }
 
         return '冻结失败';
@@ -511,9 +515,10 @@ class Member extends Model
     /**
      * 解冻实体卡
      * @param $id
+     * @param $userId
      * @return bool|string
      */
-    static public function enableCard($id)
+    static public function enableCard($id, $userId)
     {
         $member = self::find($id);
 
@@ -523,7 +528,10 @@ class Member extends Model
 
         if ($card->status == Card::STATUS_DISABLE) {
             $card->status = Card::STATUS_NORMAL;
-            if ($card->save()) return true;
+            if ($card->save()) {
+                Log::add($userId, '解冻实体卡-' . $member->name . '(' . $member->identity . ')');
+                return true;
+            }
         }
 
         return '解冻失败';
