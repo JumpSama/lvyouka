@@ -18,7 +18,7 @@ class CreateMembersTable extends Migration
             $table->integer('card_id')->default(0)->comment('卡片id');
             $table->string('name', 64)->comment('用户名');
             $table->tinyInteger('sex')->default(0)->comment('性别:0未知 1男 2女');
-            $table->string('phone', 64)->unique()->comment('手机号');
+            $table->string('phone', 64)->comment('手机号');
             $table->string('avatar')->nullable()->comment('头像');
             $table->string('identity', 64)->unique()->comment('身份证');
             $table->string('identity_front')->nullable()->comment('身份证正面');
@@ -31,6 +31,8 @@ class CreateMembersTable extends Migration
             $table->decimal('point', 18, 2)->default(0)->comment('积分');
             $table->integer('created_by')->default(0)->comment('创建人');
             $table->integer('updated_by')->default(0)->comment('更新人');
+            $table->integer('recommend_user')->default(0)->comment('推荐用户');
+            $table->integer('recommend_member')->default(0)->comment('推荐会员');
             $table->timestamps();
         });
     }

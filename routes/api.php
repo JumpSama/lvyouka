@@ -128,5 +128,16 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
         $api->post('card_use_log_add', 'MemberController@cardUseLogAdd');
         // 短信验证码发送
         $api->post('send_sms', 'MemberController@sendSms');
+
+        // 开卡、续费统计
+        $api->post('record_stats', 'StatsController@recordStats');
+        // 开卡、续费详情
+        $api->post('record_list', 'StatsController@recordList');
+        // 开卡、续费详情导出
+        $api->post('record_export', 'StatsController@recordExport');
+        // 刷卡统计
+        $api->post('used_stats', 'StatsController@usedStats');
+        // 刷卡详情
+        $api->post('used_list', 'StatsController@usedList');
     });
 });

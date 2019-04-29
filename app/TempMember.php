@@ -123,9 +123,9 @@ class TempMember extends Model
     {
         $identity = $data['identity'];
 
-        $unique = self::checkUnique($identity, $data['phone'], $openid);
+        $unique = self::checkUnique($identity, $openid);
 
-        if ($unique !== false) {
+        if ($unique !== true) {
             return [
                 'flag' => false,
                 'msg' => $unique
@@ -174,7 +174,7 @@ class TempMember extends Model
 
                 DB::commit();
 
-                return [ 'flag' => true];
+                return [ 'flag' => true ];
             } else {
                 // 支付
                 $out_trade_no = str_random(20) . '-' . time();
@@ -256,22 +256,15 @@ class TempMember extends Model
     /**
      * 检查唯一性
      * @param $identity
-     * @param $phone
      * @param $openid
      * @return bool|string
      */
-    static public function checkUnique($identity, $phone, $openid)
+    static public function checkUnique($identity, $openid)
     {
         $identityCount = self::where('identity', $identity)->where('openid', '<>', $openid)->count();
 
         if ($identityCount > 0) {
             return '身份证已存在';
-        }
-
-        $phoneCount = self::where('phone', $phone)->where('openid', '<>', $openid)->count();
-
-        if ($phoneCount > 0) {
-            return '手机号已存在';
         }
 
         $memberCount = Member::where('identity', $identity)->whereNotNull('openid')->count();
@@ -280,6 +273,6 @@ class TempMember extends Model
             return '身份证已存在';
         }
 
-        return false;
+        return true;
     }
 }

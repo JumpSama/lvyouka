@@ -124,4 +124,74 @@ class CardUsedRecord extends Model
         $record = CardRecord::where('member_id', $memberId)->where('overdue', '>=', $today)->orderBy('overdue', 'asc')->first();
         return $record->id;
     }
+
+    /**
+     * 刷卡统计
+     * @param $data
+     * @return array
+     */
+    static public function usedStats($data)
+    {
+        $type = $data['type'];
+
+        $records = DB::table('point_flows as a')
+            ->select(['a.ref_id as item_id', 'b.site_id', DB::raw('count(1) as count')])
+            ->leftJoin('site_items as b', 'a.ref_id', '=', 'b.id')
+            ->where('a.type', PointFlow::TYPE_USE);
+
+        if (isset($data['start_time'])) $records = $records->where('a.created_at', '>=', $data['start_time'] . ' 00:00:00');
+        if (isset($data['end_time'])) $records = $records->where('a.created_at', '<=', $data['end_time'] . ' 23:59:59');
+
+        $records = $records->groupBy('a.ref_id')->get();
+
+        $detail = [];
+
+        // 项目统计
+        if ($type == 'item') {
+            // 全部项目
+            $items = DB::table('site_items as a')
+                ->select(['a.id', 'a.item_name', 'a.site_id', 'b.name as site_name'])
+                ->leftJoin('sites as b', 'a.site_id', '=', 'b.id')
+                ->get();
+
+            foreach ($items as $item) {
+                $item_id = $item->id;
+
+                if (!isset($detail[$item_id])) {
+                    $detail[$item_id] = [
+                        'item_id' => $item_id,
+                        'item_name' => $item->item_name,
+                        'site_id' => $item->site_id,
+                        'site_name' => $item->site_name,
+                        'count' => 0
+                    ];
+                }
+
+                foreach ($records as $record) {
+                    if ($record->item_id == $item_id) $detail[$item_id]['count'] = $record->count;
+                }
+            }
+        } else {
+            // 全部场所
+            $sites = Site::select(['id', 'name'])->get();
+
+            foreach ($sites as $site) {
+                $site_id = $site->id;
+
+                if (!isset($detail[$site_id])) {
+                    $detail[$site_id] = [
+                        'site_id' => $site_id,
+                        'site_name' => $site->name,
+                        'count' => 0
+                    ];
+                }
+
+                foreach ($records as $record) {
+                    if ($record->site_id == $site_id) $detail[$site_id]['count'] += $record->count;
+                }
+            }
+        }
+
+        return $detail;
+    }
 }

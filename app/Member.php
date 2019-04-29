@@ -291,7 +291,7 @@ class Member extends Model
     static public function add($data, $userId)
     {
         // 参数校验
-        $unique = self::checkUnique($data['identity'], $data['phone'], $data['card_number']);
+        $unique = self::checkUnique($data['identity'], $data['card_number']);
         if ($unique !== true) return $unique;
 
         // 短信验证
@@ -347,19 +347,14 @@ class Member extends Model
     /**
      * 参数校验
      * @param $identity
-     * @param $phone
      * @param $cardNumber
      * @return bool|string
      */
-    static public function checkUnique($identity, $phone, $cardNumber)
+    static public function checkUnique($identity, $cardNumber)
     {
         $identityCount = self::where('identity', $identity)->count();
 
         if ($identityCount > 0) return '身份证已存在';
-
-        $phoneCount = self::where('phone', $phone)->count();
-
-        if ($phoneCount > 0) return '手机号已存在';
 
         $card = Card::where('number', $cardNumber)->first();
 

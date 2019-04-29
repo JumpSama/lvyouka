@@ -79,6 +79,36 @@ class MenusTableSeeder extends Seeder
                 'value' => 'log',
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
+            ],
+            [
+                'name' => '线下开卡续费详情',
+                'value' => 'card_stats',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ],
+            [
+                'name' => '线上开卡续费详情',
+                'value' => 'wechat_stats',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ],
+            [
+                'name' => '开卡续费统计',
+                'value' => 'total_stats',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ],
+            [
+                'name' => '刷卡详情',
+                'value' => 'used_list',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ],
+            [
+                'name' => '刷卡统计',
+                'value' => 'used_stats',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
             ]
         ]);
     }
