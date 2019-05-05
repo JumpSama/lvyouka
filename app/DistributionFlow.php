@@ -19,9 +19,10 @@ class DistributionFlow extends Model
      * @param $mainType
      * @param $mainId
      * @param $amount
+     * @param $memberId
      * @return bool
      */
-    static public function add($type, $mainType, $mainId, $amount)
+    static public function add($type, $mainType, $mainId, $amount, $memberId = 0)
     {
         $sql = new self;
 
@@ -29,6 +30,7 @@ class DistributionFlow extends Model
         $sql->main_type = $mainType;
         $sql->main_id = $mainId;
         $sql->amount = $amount;
+        $sql->member_id = $memberId;
 
         return $sql->save();
     }

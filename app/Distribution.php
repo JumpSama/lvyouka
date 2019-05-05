@@ -100,6 +100,8 @@ class Distribution extends Model
         try {
             self::setAmount($mainType, $mainId, bcmul($amount, -1, 2));
 
+            DistributionFlow::add(DistributionFlow::TYPE_DISTRIBUTION, $mainType, $mainId, bcmul($amount, -1, 2));
+
             Withdraw::add($mainType, $mainId, $amount);
 
             DB::commit();

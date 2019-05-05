@@ -71,16 +71,6 @@ class TempMember extends Model
                     $member->status = Member::STATUS_NORMAL;
                     $member->overdue = $overdue;
 
-                    // 用户分销
-                    if ($detail->recommend_user > 0) {
-                        $member->recommend_user = $detail->recommend_user;
-
-                        $amount = Config::get('Card.Distribution', 0);
-
-                        Distribution::setAmount(Distribution::MAIN_USER, $detail->recommend_user, $amount);
-                        DistributionFlow::add(DistributionFlow::TYPE_DISTRIBUTION, DistributionFlow::MAIN_USER, $detail->recommend_user, $amount);
-                    }
-
                     $logFlag = true;
                 }
 
@@ -92,8 +82,20 @@ class TempMember extends Model
 
                 $member->save();
 
-                // 开卡记录
-                if ($logFlag) CardRecord::add($member->id, $overdue, CardRecord::TYPE_NEW, CardRecord::PAY_ONLINE);
+                if ($logFlag) {
+                    // 开卡记录
+                    CardRecord::add($member->id, $overdue, CardRecord::TYPE_NEW, CardRecord::PAY_ONLINE);
+
+                    // 用户分销
+                    if ($detail->recommend_user > 0) {
+                        $member->recommend_user = $detail->recommend_user;
+
+                        $amount = Config::get('Card.Distribution', 0);
+
+                        Distribution::setAmount(Distribution::MAIN_USER, $detail->recommend_user, $amount);
+                        DistributionFlow::add(DistributionFlow::TYPE_DISTRIBUTION, DistributionFlow::MAIN_USER, $detail->recommend_user, $amount, $member->id);
+                    }
+                }
 
                 // 日志
                 Log::add($userId, '审核通过用户-' . $detail->name . '(' . $detail->identity . ')');
