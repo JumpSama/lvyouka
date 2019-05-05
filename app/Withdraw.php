@@ -72,7 +72,7 @@ class Withdraw extends Model
         if ($mainId > 0) $sql = $sql->where('a.main_id', $mainId);
         if (isset($data['status'])) $sql = $sql->where('a.status', $data['status']);
         if (isset($data['start_time'])) $sql = $sql->where('a.created_at', '>=', $data['start_time'] . ' 00:00:00');
-        if (isset($data['end_time'])) $sql = $sql->where('a.end_time', '<=', $data['start_time'] . ' 23:59:59');
+        if (isset($data['end_time'])) $sql = $sql->where('a.created_at', '<=', $data['end_time'] . ' 23:59:59');
 
         $total = $sql->count();
         $list = $sql->orderBy('a.created_at', 'desc')->offset($offset)->limit($limit)->get();
