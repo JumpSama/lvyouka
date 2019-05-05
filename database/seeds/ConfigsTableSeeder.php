@@ -45,6 +45,14 @@ class ConfigsTableSeeder extends Seeder
                 'value' => '30',
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
+            ],
+            [
+                'name' => '分销佣金(元)',
+                'datatype' => 'string',
+                'key' => 'Card.Distribution',
+                'value' => '10',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
             ]
         ]);
     }

@@ -71,6 +71,16 @@ class TempMember extends Model
                     $member->status = Member::STATUS_NORMAL;
                     $member->overdue = $overdue;
 
+                    // 用户分销
+                    if ($detail->recommend_user > 0) {
+                        $member->recommend_user = $detail->recommend_user;
+
+                        $amount = Config::get('Card.Distribution', 0);
+
+                        Distribution::setAmount(Distribution::MAIN_USER, $detail->recommend_user, $amount);
+                        DistributionFlow::add(DistributionFlow::TYPE_DISTRIBUTION, DistributionFlow::MAIN_USER, $detail->recommend_user, $amount);
+                    }
+
                     $logFlag = true;
                 }
 
@@ -147,10 +157,13 @@ class TempMember extends Model
             $member = self::where('openid', $openid)->first();
 
             if ($member) {
+                $first = false;
+
                 $sql = $member;
             } else {
-                $sql = new self;
+                $first = true;
 
+                $sql = new self;
                 $sql->openid = $openid;
             }
 
@@ -181,6 +194,12 @@ class TempMember extends Model
 
                 $sql->status = self::STATUS_NOT;
                 $sql->out_trade_no = $out_trade_no;
+
+                // 分销
+                if ($first && isset($data['main_type']) && isset($data['main_id'])) {
+                    if ($data['main_type'] == Distribution::MAIN_USER) $sql->recommend_user = $data['main_id'];
+                    else if ($data['main_type'] == Distribution::MAIN_MEMBER) $sql->recommend_member = $data['main_id'];
+                }
 
                 $sql->save();
 

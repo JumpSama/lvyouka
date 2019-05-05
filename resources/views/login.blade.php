@@ -98,6 +98,8 @@
 
 <script type="text/javascript">
     var countTime = 60;
+    var main_id = '{{$main_id}}';
+    var main_type = '{{$main_type}}';
     var id = '{{$memberInfo['id']}}';
     var jsConfig = JSON.parse(@json($jsConfig));
     wx.config(jsConfig);
@@ -215,7 +217,10 @@
 
         var flag = false;
         var formData = $('#memberForm').serializeArray();
-        var data = {};
+        var data = {
+            main_id: main_id,
+            main_type: main_type
+        };
 
         $(formData).each(function () {
             if (!this.value || this.value === '') {

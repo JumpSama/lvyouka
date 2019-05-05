@@ -34,7 +34,7 @@ class Member extends Model
     static public function memberList($data, $offset = 0, $limit = 10)
     {
         $sql = DB::table('members as a')
-            ->select(['a.id', 'a.card_id', 'a.name', 'a.sex', 'a.phone', 'a.identity', 'a.status', 'a.overdue', 'a.point', 'b.number', 'b.status as card_status'])
+            ->select(['a.id', 'a.card_id', 'a.name', 'a.sex', 'a.phone', 'a.identity', 'a.status', 'a.overdue', 'a.point', 'a.recommend_user', 'b.number', 'b.status as card_status'])
             ->leftJoin('cards as b', 'a.card_id', '=', 'b.id');
 
         if (isset($data['status'])) $sql = $sql->where('a.status', $data['status']);

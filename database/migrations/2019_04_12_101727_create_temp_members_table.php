@@ -24,6 +24,8 @@ class CreateTempMembersTable extends Migration
             $table->string('identity_reverse')->comment('身份证反面');
             $table->string('openid', 64)->unique()->comment('openid');
             $table->string('out_trade_no')->nullable()->comment('订单号');
+            $table->integer('recommend_user')->default(0)->comment('分销用户');
+            $table->integer('recommend_member')->default(0)->comment('分销会员');
             $table->timestamps();
         });
     }

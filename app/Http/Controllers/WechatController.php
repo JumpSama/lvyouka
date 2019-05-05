@@ -98,11 +98,9 @@ class WechatController extends BaseController
      */
     public function apply(Request $request)
     {
-        $fields = ['name', 'sex', 'identity', 'phone', 'identity_front', 'identity_reverse', 'code'];
+        if (!$request->filled(['name', 'sex', 'identity', 'phone', 'identity_front', 'identity_reverse', 'code'])) return $this->responseError('参数错误');
 
-        if (!$request->filled($fields)) return $this->responseError('参数错误');
-
-        $data = $request->only($fields);
+        $data = $request->only(['name', 'sex', 'identity', 'phone', 'identity_front', 'identity_reverse', 'code', 'main_type', 'main_id']);
 
         $result = TempMember::add($data, $this->getOpenid());
 
@@ -273,9 +271,10 @@ class WechatController extends BaseController
 
     /**
      * 会员注册页面
+     * @param Request $request
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function login()
+    public function login(Request $request)
     {
         $openid = $this->getOpenid();
 
@@ -285,7 +284,18 @@ class WechatController extends BaseController
         if ($memberInfo) $hasSubmit = true;
         $jsConfig = $this->wechat->jssdk->buildConfig(['chooseWXPay']);
 
-        return view('login', compact('hasSubmit', 'memberInfo', 'jsConfig'));
+        // 分销
+        $main_type = '';
+        $main_id = '';
+        if ($request->filled('ref')) {
+            $ref = $request->input('ref');
+            $ref = base64_decode($ref);
+            $arr = explode('@', $ref);
+            $main_type = $arr[0];
+            $main_id = $arr[1];
+        }
+
+        return view('login', compact('hasSubmit', 'memberInfo', 'jsConfig', 'main_type', 'main_id'));
     }
 
     /**

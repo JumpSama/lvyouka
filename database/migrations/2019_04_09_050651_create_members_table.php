@@ -31,8 +31,8 @@ class CreateMembersTable extends Migration
             $table->decimal('point', 18, 2)->default(0)->comment('积分');
             $table->integer('created_by')->default(0)->comment('创建人');
             $table->integer('updated_by')->default(0)->comment('更新人');
-            $table->integer('recommend_user')->default(0)->comment('推荐用户');
-            $table->integer('recommend_member')->default(0)->comment('推荐会员');
+            $table->integer('recommend_user')->default(0)->comment('分销用户');
+            $table->integer('recommend_member')->default(0)->comment('分销会员');
             $table->timestamps();
         });
     }

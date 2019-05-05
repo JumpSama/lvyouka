@@ -139,5 +139,20 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
         $api->post('used_stats', 'StatsController@usedStats');
         // 刷卡详情
         $api->post('used_list', 'StatsController@usedList');
+
+        // 分销二维码
+        $api->post('distribution_qrcode', 'DistributionController@distributionQrcode');
+        // 分销金额
+        $api->post('distribution_amount', 'DistributionController@distributionAmount');
+        // 分销记录
+        $api->post('distribution_list', 'DistributionController@distributionList');
+        // 提现
+        $api->post('withdraw', 'DistributionController@withdraw');
+        // 当前用户提现记录
+        $api->post('withdraw_my', 'DistributionController@withdrawMy');
+        // 提现记录
+        $api->post('withdraw_list', 'DistributionController@withdrawList');
+        // 提现记录操作
+        $api->post('withdraw_operate', 'DistributionController@withdrawOperate');
     });
 });

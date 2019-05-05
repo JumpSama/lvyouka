@@ -109,6 +109,24 @@ class MenusTableSeeder extends Seeder
                 'value' => 'used_stats',
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
+            ],
+            [
+                'name' => '分销',
+                'value' => 'distribution',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ],
+            [
+                'name' => '提现',
+                'value' => 'withdraw',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ],
+            [
+                'name' => '提现审核',
+                'value' => 'withdraw_approve',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
             ]
         ]);
     }
