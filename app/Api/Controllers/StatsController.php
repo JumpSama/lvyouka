@@ -11,6 +11,7 @@ namespace App\Api\Controllers;
 use App\CardRecord;
 use App\CardUsedRecord;
 use App\Exports\CardRecordsExport;
+use App\Member;
 use App\PointFlow;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -52,7 +53,7 @@ class StatsController extends BaseController
         try {
             $export = new CardRecordsExport();
             $export = $export->setData($data);
-            $fileName = ($data['pay_type'] == 1 ? '线下' : '线上') . '开卡续费记录_' . time() . '.xlsx';
+            $fileName = 'stats/' . Member::datePath() . ($data['pay_type'] == 1 ? '线下' : '线上') . '开卡续费记录_' . time() . '.xlsx';
             $excel = Excel::store($export, $fileName);
             if ($excel) {
                 $filePath = config('app.image_domain') . $fileName;

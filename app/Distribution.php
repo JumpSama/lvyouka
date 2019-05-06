@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use ZipArchive;
 
 class Distribution extends Model
 {
@@ -33,7 +34,16 @@ class Distribution extends Model
             Storage::put($path, $image);
         }
 
-        return [ 'url' => config('app.image_domain') . $path ];
+        $zipFile = 'qrcode/' . Member::datePath() .  'qrcode_' . time() . '.zip';
+        $zip = new \ZipArchive();
+        $zip->open(storage_path('app/public') . '/' . $zipFile, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+        $zip->addFile(storage_path('app/public') . '/' . $path, 'qrcode.png');
+        $zip->close();
+
+        return [
+            'url' => config('app.image_domain') . $path,
+            'zip' => config('app.image_domain') . $zipFile
+        ];
     }
 
     /**
