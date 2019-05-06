@@ -56,7 +56,7 @@ class DistributionController extends BaseController
      */
     public function distributionList(Request $request)
     {
-        $data = $request->only(['start_time', 'end_time']);
+        $data = $request->only(['type', 'start_time', 'end_time']);
 
         $offset = $request->input('offset', 0);
         $limit = $request->input('limit', 10);
