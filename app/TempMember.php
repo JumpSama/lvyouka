@@ -71,6 +71,8 @@ class TempMember extends Model
                     $member->status = Member::STATUS_NORMAL;
                     $member->overdue = $overdue;
 
+                    if ($detail->recommend_user > 0) $member->recommend_user = $detail->recommend_user;
+
                     $logFlag = true;
                 }
 
@@ -88,8 +90,6 @@ class TempMember extends Model
 
                     // 用户分销
                     if ($detail->recommend_user > 0) {
-                        $member->recommend_user = $detail->recommend_user;
-
                         $amount = Config::get('Card.Distribution', 0);
 
                         Distribution::setAmount(Distribution::MAIN_USER, $detail->recommend_user, $amount);
